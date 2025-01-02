@@ -1,19 +1,17 @@
 name: Update Web Player Registry
 
-on:
-  workflow_call:
-    inputs:
-      game_name:
-        description: 'Game name to update'
-        required: true
-        type: string
-      url_prefix:
-        description: 'URL prefix to update'
-        required: true
-        type: string
-      compression:
-        description: 'Compression setting'
-        type: string # brotli or gzip, leave empty for no compression
+inputs:
+  game_name:
+    description: 'Game name to update'
+    required: true
+    type: string
+  url_prefix:
+    description: 'URL prefix to update'
+    required: true
+    type: string
+  compression:
+    description: 'Compression setting'
+    type: string # brotli or gzip, leave empty for no compression
 
 runs:
   using: "composite"
