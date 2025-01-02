@@ -13,12 +13,7 @@ on:
         type: string
       compression:
         description: 'Compression setting'
-        required: true
-        type: choice
-        options:
-          - brotli
-          - gzip
-          - none
+        type: string # brotli or gzip, leave empty for no compression
 
 jobs:
   update-config:
