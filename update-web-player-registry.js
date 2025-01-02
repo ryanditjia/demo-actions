@@ -4,6 +4,7 @@
 
 const urlPrefix = process.env.URL_PREFIX
 const compression = process.env.COMPRESSION
+const gameName = process.env.GAME_NAME
 
 // // Update only if values are provided
 // Object.entries(updates).forEach(([key, value]) => {
@@ -14,4 +15,4 @@ const compression = process.env.COMPRESSION
 
 // fs.writeFileSync(jsonPath, JSON.stringify(content, null, 2))
 
-console.log({ urlPrefix, compression })
+console.log({ urlPrefix, compression, gameName })
