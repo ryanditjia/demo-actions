@@ -26,5 +26,5 @@ jobs:
           GAME_NAME: ${{ inputs.game_name }}
           URL_PREFIX: ${{ inputs.url_prefix }}
           COMPRESSION: ${{ inputs.compression }}
-        run: node .github/update-json.js
+        run: node update-web-player-registry.js
 
