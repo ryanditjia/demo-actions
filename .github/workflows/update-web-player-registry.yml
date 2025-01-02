@@ -15,16 +15,13 @@ on:
         description: 'Compression setting'
         type: string # brotli or gzip, leave empty for no compression
 
-jobs:
-  update-config:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
 
-      - name: Update Configuration
-        env:
-          GAME_NAME: ${{ inputs.game_name }}
-          URL_PREFIX: ${{ inputs.url_prefix }}
-          COMPRESSION: ${{ inputs.compression }}
-        run: node update-web-player-registry.js
-
+    - env:
+        GAME_NAME: ${{ inputs.game_name }}
+        URL_PREFIX: ${{ inputs.url_prefix }}
+        COMPRESSION: ${{ inputs.compression }}
+      run: node update-web-player-registry.js
