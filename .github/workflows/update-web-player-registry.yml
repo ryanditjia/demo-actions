@@ -1,0 +1,53 @@
+name: Update JSON Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      game_name:
+        description: 'Game name to update'
+        required: true
+        type: string
+      url_prefix:
+        description: 'URL prefix to update'
+        required: true
+        type: string
+      compression:
+        description: 'Compression setting'
+        required: true
+        type: choice
+        options:
+          - gzip
+          - brotli
+          - none
+  workflow_call:
+    inputs:
+      game_name:
+        description: 'Game name to update'
+        required: true
+        type: string
+      url_prefix:
+        description: 'URL prefix to update'
+        required: true
+        type: string
+      compression:
+        description: 'Compression setting'
+        required: true
+        type: string
+        enum:
+          - gzip
+          - brotli
+          - none
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update Configuration
+        env:
+          GAME_NAME: ${{ inputs.game_name }}
+          URL_PREFIX: ${{ inputs.url_prefix }}
+          COMPRESSION: ${{ inputs.compression }}
+        run: node .github/update-json.js
+
