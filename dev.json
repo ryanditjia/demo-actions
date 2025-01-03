@@ -1,0 +1,10 @@
+{
+  "blocksurvivor": {
+    "url_prefix": "https://dev-cdn.blocksurvivor.com/asdf1234/WebGL",
+    "compression": "brotli"
+  },
+  "anothergame": {
+    "url_prefix": "https://dev-cdn.anothergame.com/asdf1234/WebGL",
+    "compression": "brotli"
+  }
+}

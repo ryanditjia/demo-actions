@@ -1,3 +1,10 @@
 {
-  "name": "2239"
+  "blocksurvivor": {
+    "url_prefix": "https://cdn.blocksurvivor.com/bedb05af298a2ef1e2f9f1187d60179c0c26b480/WebGL",
+    "compression": "brotli"
+  },
+  "anothergame": {
+    "url_prefix": "https://cdn.anothergame.com/asdf1234/WebGL",
+    "compression": "brotli"
+  }
 }

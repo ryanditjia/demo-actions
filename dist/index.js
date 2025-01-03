@@ -7401,6 +7401,31 @@ function onceStrict (fn) {
 
 /***/ }),
 
+/***/ 5419:
+/***/ ((module) => {
+
+"use strict";
+
+
+var isProduction = process.env.NODE_ENV === 'production';
+var prefix = 'Invariant failed';
+function invariant(condition, message) {
+    if (condition) {
+        return;
+    }
+    if (isProduction) {
+        throw new Error(prefix);
+    }
+    var provided = typeof message === 'function' ? message() : message;
+    var value = provided ? "".concat(prefix, ": ").concat(provided) : prefix;
+    throw new Error(value);
+}
+
+module.exports = invariant;
+
+
+/***/ }),
+
 /***/ 6124:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -31813,44 +31838,77 @@ module.exports = parseParams
 var __webpack_exports__ = {};
 const core = __nccwpck_require__(9999)
 const github = __nccwpck_require__(2819)
+const invariant = __nccwpck_require__(5419)
+
+const envs = ['prod', 'dev']
+const compressionTypes = ['brotli', 'gzip', null]
+const jsonByEnv = {
+  prod: 'prod.json',
+  dev: 'dev.json',
+}
 
 main()
 
 async function main() {
   try {
-    const updatedValue = core.getInput('updated-value')
-    const octokit = github.getOctokit(core.getInput('myToken'))
+    const webPlayerRepoPat = core.getInput('web-player-repo-pat')
+    const webPlayerEnv = core.getInput('web-player-env')
+    const gameName = core.getInput('game-name')
+    const urlPrefix = core.getInput('url-prefix')
+    const compression = core.getInput('compression')
+
+    invariant(
+      envs.includes(webPlayerEnv),
+      `Invalid environment: ${webPlayerEnv}, must be one of ${envs.join(', ')}`
+    )
+
+    invariant(
+      compressionTypes.includes(compression),
+      `Invalid compression: ${compression}, must be one of ${compressionTypes.join(', ')}`
+    )
+
+    const octokit = github.getOctokit(webPlayerRepoPat)
 
     const owner = 'ryanditjia'
     const repo = 'demo-actions'
-    const path = 'prod.json'
+    const jsonFilename = jsonByEnv[webPlayerEnv]
     const branch = 'registry'
 
     const { data: currentFile } = await octokit.rest.repos.getContent({
       owner,
       repo,
-      path,
+      path: jsonFilename,
       ref: branch,
     })
 
-    const json = JSON.parse(Buffer.from(currentFile.content, 'base64').toString())
-    json.name = updatedValue
+    const currentJSON = JSON.parse(Buffer.from(currentFile.content, 'base64').toString())
+
+    const updatedJSON = updateRegistryJSON({
+      gameName,
+      urlPrefix,
+      compression,
+      currentJSON,
+    })
 
     const response = await octokit.rest.repos.createOrUpdateFileContents({
       owner,
       repo,
-      path,
+      path: jsonFilename,
       committer: {
         name: 'github-actions[bot]',
         email: 'github-actions[bot]@users.noreply.github.com',
       },
-      message: `feat: update ${path}`,
-      content: Buffer.from(JSON.stringify(json, null, 2)).toString('base64'),
+      message: `feat: update ${jsonFilename}`,
+      content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
       branch: branch,
       sha: currentFile.sha,
     })
 
-    console.log(response)
+    if (response.status === 200 || response.status === 201) {
+      console.log(updatedJSON)
+    } else {
+      throw new Error(`Failed to update ${jsonFilename}: ${response.status}`)
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
