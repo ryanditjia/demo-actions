@@ -9,6 +9,7 @@ try {
   prodJson.name = updatedValue
   fs.writeFileSync('./prod.json', JSON.stringify(prodJson, null, 2))
   // commit the change
+  console.log('process.env.GITHUB_TOKEN', process.env.GITHUB_TOKEN)
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
   octokit.rest.git
     .createCommit({
