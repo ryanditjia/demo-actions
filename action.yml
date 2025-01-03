@@ -1,0 +1,49 @@
+# name: Update Web Player Registry
+
+# inputs:
+#   game_name:
+#     description: 'Game name to update'
+#     required: true
+#     type: string
+#   url_prefix:
+#     description: 'URL prefix to update'
+#     required: true
+#     type: string
+#   compression:
+#     description: 'Compression setting'
+#     type: string # brotli or gzip, leave empty for no compression
+
+# runs:
+#   using: "composite"
+#   steps:
+#     - name: Check GitHub Path
+#       run: echo "$GITHUB_ACTION_PATH"
+#       shell: bash
+
+#     - name: Set GitHub Path
+#       run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+#       shell: bash
+#       env:
+#         GITHUB_ACTION_PATH: ${{ github.action_path }}
+
+#     - name: Run updater script
+#       env:
+#         GAME_NAME: ${{ inputs.game_name }}
+#         URL_PREFIX: ${{ inputs.url_prefix }}
+#         COMPRESSION: ${{ inputs.compression }}
+#       run: node update-web-player-registry.js
+#       shell: bash
+
+name: 'Hello World'
+description: 'Greet someone and record the time'
+inputs:
+  who-to-greet:  # id of input
+    description: 'Who to greet'
+    required: true
+    default: 'World'
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
+runs:
+  using: 'node22'
+  main: 'index.js'
