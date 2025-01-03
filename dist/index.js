@@ -31829,9 +31829,9 @@ try {
   const prodJson = __nccwpck_require__(2395)
   prodJson.name = updatedValue
   fs.writeFileSync('./prod.json', JSON.stringify(prodJson, null, 2))
-  // commit the change
-  console.log('process.env.GITHUB_TOKEN', process.env.GITHUB_TOKEN)
-  const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
+  const myToken = core.getInput('myToken')
+  console.log('myToken', myToken)
+  const octokit = github.getOctokit(myToken)
   octokit.rest.git
     .createCommit({
       owner: 'ryanditjia',
