@@ -31822,27 +31822,37 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(9999)
 const github = __nccwpck_require__(2819)
 
-try {
-  const updatedValue = core.getInput('updated-value')
-  const octokit = github.getOctokit(core.getInput('myToken'))
+main()
 
-  const prodJson = __nccwpck_require__(2395)
-  prodJson.name = updatedValue
+async function main() {
+  try {
+    const updatedValue = core.getInput('updated-value')
+    const octokit = github.getOctokit(core.getInput('myToken'))
 
-  octokit.rest.repos
-    .createOrUpdateFileContents({
+    const prodJson = __nccwpck_require__(2395)
+    prodJson.name = updatedValue
+
+    const { data: currentFile } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: 'prod.json',
+      ref: 'registry',
+    })
+
+    const response = await octokit.rest.repos.createOrUpdateFileContents({
       owner: 'ryanditjia',
       repo: 'demo-actions',
       path: 'prod.json',
       message: 'feat: update prod.json',
       content: Buffer.from(JSON.stringify(prodJson, null, 2)).toString('base64'),
       branch: 'registry',
+      sha: currentFile.sha,
     })
-    .then((response) => {
-      console.log(response)
-    })
-} catch (error) {
-  core.setFailed(error.message)
+
+    console.log(response)
+  } catch (error) {
+    core.setFailed(error.message)
+  }
 }
 
 module.exports = __webpack_exports__;
