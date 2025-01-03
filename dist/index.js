@@ -31831,6 +31831,7 @@ try {
   fs.writeFileSync('./prod.json', JSON.stringify(prodJson, null, 2))
   const myToken = core.getInput('myToken')
   console.log('env.GITHUB_TOKEN', process.env.GITHUB_TOKEN)
+  console.log('env.SOMETHING', process.env.SOMETHING)
   console.log('myToken', myToken)
   const octokit = github.getOctokit(myToken)
   octokit.rest.git
