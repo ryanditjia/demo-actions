@@ -49,5 +49,3 @@ outputs:
 runs:
   using: 'node20'
   main: 'dist/index.js'
-env:
-  SOMETHING: ${{ vars.SOMETHING }}
