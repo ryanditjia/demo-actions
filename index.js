@@ -27,7 +27,11 @@ async function main() {
       owner,
       repo,
       path,
-      message: 'feat: update prod.json',
+      committer: {
+        name: 'github-actions[bot]',
+        email: 'github-actions[bot]@users.noreply.github.com',
+      },
+      message: `feat: update ${path}`,
       content: Buffer.from(JSON.stringify(json, null, 2)).toString('base64'),
       branch: branch,
       sha: currentFile.sha,
