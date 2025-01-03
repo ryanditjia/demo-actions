@@ -29932,6 +29932,32 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 5028:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   updateRegistryJSON: () => (/* binding */ updateRegistryJSON)
+/* harmony export */ });
+/**
+ * @param {Object} options
+ * @param {string} options.gameName
+ * @param {string} options.urlPrefix
+ * @param {string} options.compression
+ * @param {import("./types").Registry} options.currentJSON
+ *
+ * @returns {import("./types").Registry}
+ */
+function updateRegistryJSON({ gameName, urlPrefix, compression, currentJSON }) {
+  const map = new Map(Object.entries(currentJSON))
+  map.set(gameName, { url_prefix: urlPrefix, compression })
+  return Object.fromEntries(map)
+}
+
+
+/***/ }),
+
 /***/ 2613:
 /***/ ((module) => {
 
@@ -31830,6 +31856,34 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -31839,6 +31893,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(9999)
 const github = __nccwpck_require__(2819)
 const invariant = __nccwpck_require__(5419)
+const { updateRegistryJSON } = __nccwpck_require__(5028)
 
 const envs = ['prod', 'dev']
 const compressionTypes = ['brotli', 'gzip', null]

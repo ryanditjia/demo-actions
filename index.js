@@ -1,6 +1,7 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
 const invariant = require('tiny-invariant')
+const { updateRegistryJSON } = require('./update-json')
 
 const envs = ['prod', 'dev']
 const compressionTypes = ['brotli', 'gzip', null]
