@@ -31819,27 +31819,24 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"initialvalue"}');
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-const fs = __nccwpck_require__(9896)
 const core = __nccwpck_require__(9999)
 const github = __nccwpck_require__(2819)
 
 try {
   const updatedValue = core.getInput('updated-value')
-  // update prod.json with updatedValue
+  const octokit = github.getOctokit(core.getInput('myToken'))
+
   const prodJson = __nccwpck_require__(2395)
   prodJson.name = updatedValue
-  fs.writeFileSync('./prod.json', JSON.stringify(prodJson, null, 2))
-  const myToken = core.getInput('myToken')
-  console.log('env.GITHUB_TOKEN', process.env.GITHUB_TOKEN)
-  console.log('env.SOMETHING', process.env.SOMETHING)
-  console.log('myToken', myToken)
-  const octokit = github.getOctokit(myToken)
-  octokit.rest.git
-    .createCommit({
+
+  octokit.rest.repos
+    .createOrUpdateFileContents({
       owner: 'ryanditjia',
       repo: 'demo-actions',
+      path: 'prod.json',
       message: 'feat: update prod.json',
-      tree: 'registry',
+      content: Buffer.from(JSON.stringify(prodJson, null, 2)).toString('base64'),
+      branch: 'registry',
     })
     .then((response) => {
       console.log(response)
