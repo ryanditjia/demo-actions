@@ -21,6 +21,7 @@ async function main() {
     const compression = core.getInput('compression')
 
     invariant(!!webPlayerRepoPat, 'web-player-repo-pat is required')
+    console.log('webPlayerRepoPat', webPlayerRepoPat)
 
     invariant(
       envs.includes(webPlayerEnv),
