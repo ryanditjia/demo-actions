@@ -20,6 +20,8 @@ async function main() {
     const urlPrefix = core.getInput('url-prefix')
     const compression = core.getInput('compression')
 
+    invariant(!!webPlayerRepoPat, 'web-player-repo-pat is required')
+
     invariant(
       envs.includes(webPlayerEnv),
       `Invalid environment: ${webPlayerEnv}, must be one of ${envs.join(', ')}`
