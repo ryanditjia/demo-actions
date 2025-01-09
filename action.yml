@@ -1,21 +1,32 @@
-name: 'Update Argus Web Player Registry'
-description: 'Update the Argus Web Player Registry by providing the game name, URL prefix, and compression setting.'
+name: 'Web Player – Upload to R2 and Update Registry'
 inputs:
   web-player-repo-pat:
     description: 'Fine-grained personal access token that has write access to the Web Player repo. Example: github_pat_asdf1234'
     required: true
   web-player-env:
-    description: 'The environment to update. Example: prod | dev (for prod.json and dev.json respectively)'
+    description: 'The environment to update. Example: production | development (for production.json and development.json respectively)'
     required: true
   game-name:
-    description: 'Game name to update. Example: blocksurvivor'
+    description: 'Game name being uploaded. Example: blocksurvivor'
     required: true
-  url-prefix:
-    description: 'The updated CDN URL prefix. Example: https://cdn.blocksurvivor.com/new1234/WebGL'
+  webgl-build-dir:
+    description: 'Path to the WebGL build directory. Example: ./build/WebGL/WebGL/Build'
     required: true
-  compression:
-    description: 'Compression setting. Example: brotli | gzip'
-    type: string
+  r2-access-key:
+    description: 'R2 access key'
+    required: true
+  r2-secret-key:
+    description: 'R2 secret key'
+    required: true
+  r2-account-id:
+    description: 'R2 account ID'
+    required: true
+  r2-bucket:
+    description: 'R2 bucket'
+    required: true
+  r2-destination-dir:
+    description: 'R2 destination directory'
+    required: true
 runs:
   using: 'node20'
   main: 'dist/index.js'

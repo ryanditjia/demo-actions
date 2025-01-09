@@ -1,38 +1,48 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
 const invariant = require('tiny-invariant')
+const fs = require('fs/promises')
+const { R2Uploader } = require('./r2-uploader')
 const { updateRegistryJSON } = require('./update-json')
 
-const envs = ['prod', 'dev']
-const compressionTypes = ['brotli', 'gzip', null]
+const envs = ['production', 'development']
 const jsonByEnv = {
-  prod: 'prod.json',
-  dev: 'dev.json',
+  production: 'production.json',
+  development: 'development.json',
 }
 
 main()
 
 async function main() {
   try {
-    const webPlayerRepoPat = core.getInput('web-player-repo-pat')
-    const webPlayerEnv = core.getInput('web-player-env')
-    const gameName = core.getInput('game-name')
-    const urlPrefix = core.getInput('url-prefix')
-    const compression = core.getInput('compression')
-
-    core.info(`webPlayerRepoPat: ${webPlayerRepoPat}`)
-
-    invariant(!!webPlayerRepoPat, 'web-player-repo-pat is required')
+    const webPlayerRepoPat = core.getInput('web-player-repo-pat', { required: true })
+    const webPlayerEnv = core.getInput('web-player-env', { required: true })
+    const gameName = core.getInput('game-name', { required: true })
+    const webGLBuildDir = core.getInput('webgl-build-dir', { required: true })
+    const r2AccessKey = core.getInput('r2-access-key', { required: true })
+    const r2SecretKey = core.getInput('r2-secret-key', { required: true })
+    const r2AccountId = core.getInput('r2-account-id', { required: true })
+    const r2Bucket = core.getInput('r2-bucket', { required: true })
+    const r2DestinationDir = core.getInput('r2-destination-dir', { required: true })
 
     invariant(
       envs.includes(webPlayerEnv),
-      `Invalid environment: ${webPlayerEnv}, must be one of ${envs.join(', ')}`
+      `Invalid web-player-env: ${webPlayerEnv}, must be one of ${envs.join(', ')}`
     )
 
-    invariant(
-      compressionTypes.includes(compression),
-      `Invalid compression: ${compression}, must be one of ${compressionTypes.join(', ')}`
-    )
+    const r2Uploader = new R2Uploader({
+      r2AccessKey,
+      r2SecretKey,
+      r2AccountId,
+      r2Bucket,
+      r2DestinationDir,
+      webGLBuildDir,
+    })
+
+    const files = await fs.readdir(webGLBuildDir)
+
+    const uploadPromises = files.map((file) => r2Uploader.upload(file))
+    await Promise.all(uploadPromises)
 
     const octokit = github.getOctokit(webPlayerRepoPat)
 
