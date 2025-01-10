@@ -65012,7 +65012,7 @@ function postBuildSizeToPR(webGLBuildDir, octokit) {
 function getBuildSize(webGLBuildDir) {
     return __awaiter(this, void 0, void 0, function* () {
         const tempFile = 'build_size.txt';
-        yield (0, exec_1.exec)(`du -a -h --max-depth=0 ${webGLBuildDir}/* | sort -h -r > ${tempFile}`);
+        yield (0, exec_1.exec)(`du -a -h --max-depth=0 ${webGLBuildDir}/* > ${tempFile}`);
         const output = (0, fs_1.readFileSync)(tempFile, 'utf8');
         (0, fs_1.unlinkSync)(tempFile);
         return output;
