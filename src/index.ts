@@ -19,7 +19,25 @@ const isValidWebPlayerEnv = (env: string): env is keyof typeof JSON_BY_ENV =>
 const isValidCompression = (compression: string): compression is Compression =>
   COMPRESSIONS.some((e) => e === compression)
 
-main()
+main2()
+
+async function main2() {
+  if (github.context.eventName !== 'pull_request') return
+  const prNumber = github.context.payload.pull_request?.number
+  if (!prNumber) return
+
+  const githubToken = core.getInput('github-token')
+  const octokit = github.getOctokit(githubToken)
+
+  console.log(github.context.repo)
+
+  const response = await octokit.rest.issues.createComment({
+    ...github.context.repo,
+    issue_number: prNumber,
+    body: 'Hello, world!',
+  })
+  console.log(response)
+}
 
 async function main() {
   try {

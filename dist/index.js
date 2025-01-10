@@ -64847,7 +64847,22 @@ const constants_1 = __nccwpck_require__(9316);
 const post_build_size_to_pr_1 = __nccwpck_require__(3737);
 const isValidWebPlayerEnv = (env) => constants_1.WEB_PLAYER_ENVS.some((e) => e === env);
 const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) => e === compression);
-main();
+main2();
+function main2() {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        if (github.context.eventName !== 'pull_request')
+            return;
+        const prNumber = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
+        if (!prNumber)
+            return;
+        const githubToken = core.getInput('github-token');
+        const octokit = github.getOctokit(githubToken);
+        console.log(github.context.repo);
+        const response = yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body: 'Hello, world!' }));
+        console.log(response);
+    });
+}
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -65001,7 +65016,7 @@ function postBuildSizeToPR(webGLBuildDir) {
         const buildSize = yield getBuildSize(webGLBuildDir);
         const body = formatBody(buildSize);
         const githubToken = core.getInput('github-token');
-        const octokit = github.getOctokit('');
+        const octokit = github.getOctokit(githubToken);
         const existingComment = yield findExistingComment(octokit, prNumber);
         if (existingComment) {
             yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, github.context.repo), { comment_id: existingComment.id, body }));

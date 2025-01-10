@@ -14,7 +14,7 @@ export async function postBuildSizeToPR(webGLBuildDir: string) {
   const body = formatBody(buildSize)
 
   const githubToken = core.getInput('github-token')
-  const octokit = github.getOctokit('')
+  const octokit = github.getOctokit(githubToken)
 
   const existingComment = await findExistingComment(octokit, prNumber)
 
