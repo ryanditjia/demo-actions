@@ -59,7 +59,8 @@ function formatBody(buildSize: string) {
   return `
 ### :file_folder: Artifact Build Size Info!
 ___
-\`\`\`${buildSize}\`\`\`
+\`\`\`
+${buildSize}\`\`\`
 <!-- ${BUILD_SIZE_COMMENT_LANDMARK} -->
 `
 }
