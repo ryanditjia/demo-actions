@@ -100,6 +100,8 @@ async function main() {
     })
 
     if (response.status === 200 || response.status === 201) {
+      console.log(`Updated ${jsonFilename} in registry:`)
+      console.log(updatedJSON)
       await postBuildSizeToPR(webGLBuildDir)
     } else {
       throw new Error(`Unable to update ${jsonFilename}`)

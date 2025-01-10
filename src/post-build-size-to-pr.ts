@@ -24,12 +24,14 @@ export async function postBuildSizeToPR(webGLBuildDir: string) {
       comment_id: existingComment.id,
       body,
     })
+    console.log('Updated existing PR comment')
   } else {
     await octokit.rest.issues.createComment({
       ...github.context.repo,
       issue_number: prNumber,
       body,
     })
+    console.log('Created new PR comment')
   }
 }
 

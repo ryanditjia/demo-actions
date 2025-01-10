@@ -53,10 +53,11 @@ export class R2Uploader {
   async upload(filename: string) {
     const pathToFile = join(this.webGLBuildDir, filename)
     const file = await readFile(pathToFile)
+    const key = `${this.r2DestinationDir}/${filename}`
 
     const command = new PutObjectCommand({
       Bucket: this.r2Bucket,
-      Key: `${this.r2DestinationDir}/${filename}`,
+      Key: key,
       Body: file,
       ContentType: getContentType(filename),
     })
@@ -68,7 +69,10 @@ export class R2Uploader {
     }
 
     const response = await this.client.send(command)
-    console.log(response)
+    if (response.$metadata.httpStatusCode === 200) {
+      console.log(`Uploaded ${key} to R2`)
+    }
+    return response
   }
 }
 

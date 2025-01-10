@@ -64913,6 +64913,8 @@ function main() {
                 sha: currentFile.sha,
             });
             if (response.status === 200 || response.status === 201) {
+                console.log(`Updated ${jsonFilename} in registry:`);
+                console.log(updatedJSON);
                 yield (0, post_build_size_to_pr_1.postBuildSizeToPR)(webGLBuildDir);
             }
             else {
@@ -65006,9 +65008,11 @@ function postBuildSizeToPR(webGLBuildDir) {
         const existingComment = yield findExistingComment(octokit, prNumber);
         if (existingComment) {
             yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, github.context.repo), { comment_id: existingComment.id, body }));
+            console.log('Updated existing PR comment');
         }
         else {
             yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body }));
+            console.log('Created new PR comment');
         }
     });
 }
@@ -65119,9 +65123,10 @@ class R2Uploader {
         return __awaiter(this, void 0, void 0, function* () {
             const pathToFile = (0, path_1.join)(this.webGLBuildDir, filename);
             const file = yield (0, promises_1.readFile)(pathToFile);
+            const key = `${this.r2DestinationDir}/${filename}`;
             const command = new client_s3_1.PutObjectCommand({
                 Bucket: this.r2Bucket,
-                Key: `${this.r2DestinationDir}/${filename}`,
+                Key: key,
                 Body: file,
                 ContentType: getContentType(filename),
             });
@@ -65132,7 +65137,10 @@ class R2Uploader {
                 command.input.ContentEncoding = 'gzip';
             }
             const response = yield this.client.send(command);
-            console.log(response);
+            if (response.$metadata.httpStatusCode === 200) {
+                console.log(`Uploaded ${key} to R2`);
+            }
+            return response;
         });
     }
 }
