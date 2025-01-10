@@ -6,5 +6,9 @@
   "anothergame": {
     "url_prefix": "https://dev-cdn.anothergame.com/asdf1234/WebGL",
     "compression": "brotli"
+  },
+  "demoargusid": {
+    "url_prefix": "https://cdn.ryanditjia.com/1bfb505b7fbbd3f4a42b55b1e6cb8664e38f634a/WebGL",
+    "compression": "brotli"
   }
 }
