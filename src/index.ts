@@ -3,7 +3,8 @@ import * as github from '@actions/github'
 import { readdir } from 'fs/promises'
 import { R2Uploader } from './r2-uploader'
 import { updateRegistryJSON } from './update-registry-json'
-import { COMPRESSIONS, JSON_BY_ENV, REGISTRY_DIR, WEB_PLAYER_ENVS } from './constants'
+import { COMPRESSIONS, JSON_BY_ENV, REGISTRY_DIR, REGISTRY_REPO, WEB_PLAYER_ENVS } from './constants'
+import { postBuildSizeToPR } from './post-build-size-to-pr'
 import type { Compression } from './types'
 
 const isValidWebPlayerEnv = (env: string): env is keyof typeof JSON_BY_ENV =>
@@ -54,17 +55,14 @@ async function main() {
     await Promise.all(uploadPromises)
 
     const octokit = github.getOctokit(webPlayerRepoPat)
-    const owner = 'ryanditjia'
-    const repo = 'demo-actions'
     const jsonFilename = JSON_BY_ENV[webPlayerEnv]
     const pathToRegistryFile = `${REGISTRY_DIR}/${jsonFilename}`
-    const branch = 'registry'
 
     const { data: currentFile } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
+      owner: REGISTRY_REPO.OWNER,
+      repo: REGISTRY_REPO.NAME,
       path: pathToRegistryFile,
-      ref: branch,
+      ref: REGISTRY_REPO.BRANCH,
     })
 
     if (Array.isArray(currentFile) || currentFile.type !== 'file') {
@@ -81,8 +79,8 @@ async function main() {
     })
 
     const response = await octokit.rest.repos.createOrUpdateFileContents({
-      owner,
-      repo,
+      owner: REGISTRY_REPO.OWNER,
+      repo: REGISTRY_REPO.NAME,
       path: pathToRegistryFile,
       committer: {
         name: 'github-actions[bot]',
@@ -90,12 +88,12 @@ async function main() {
       },
       message: `feat: update ${jsonFilename}`,
       content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
-      branch: branch,
+      branch: REGISTRY_REPO.BRANCH,
       sha: currentFile.sha,
     })
 
     if (response.status === 200 || response.status === 201) {
-      console.log(updatedJSON)
+      await postBuildSizeToPR(webGLBuildDir, octokit)
     } else {
       throw new Error(`Unable to update ${jsonFilename}`)
     }

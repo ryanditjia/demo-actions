@@ -64767,14 +64767,25 @@ function wrappy (fn, cb) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.JSON_BY_ENV = exports.REGISTRY_DIR = exports.WEB_PLAYER_ENVS = exports.COMPRESSIONS = void 0;
+exports.BUILD_SIZE_COMMENT_LANDMARK = exports.JSON_BY_ENV = exports.REGISTRY_DIR = exports.REGISTRY_REPO = exports.WEB_PLAYER_ENVS = exports.COMPRESSIONS = void 0;
 exports.COMPRESSIONS = ['brotli', 'gzip', 'none'];
 exports.WEB_PLAYER_ENVS = ['production', 'development'];
+exports.REGISTRY_REPO = {
+    OWNER: 'ryanditjia',
+    NAME: 'demo-actions',
+    BRANCH: 'registry',
+};
 exports.REGISTRY_DIR = 'registries';
 exports.JSON_BY_ENV = {
     production: 'production.json',
     development: 'development.json',
 };
+/**
+ * Landmark of the Artifact Build Size Info comment.
+ * Used to identify if there is already a comment in the PR.
+ * If there is, we will update the comment instead of creating a new one.
+ */
+exports.BUILD_SIZE_COMMENT_LANDMARK = 'artifact-build-size-info';
 
 
 /***/ }),
@@ -64833,6 +64844,7 @@ const promises_1 = __nccwpck_require__(1943);
 const r2_uploader_1 = __nccwpck_require__(8800);
 const update_registry_json_1 = __nccwpck_require__(8701);
 const constants_1 = __nccwpck_require__(9316);
+const post_build_size_to_pr_1 = __nccwpck_require__(3737);
 const isValidWebPlayerEnv = (env) => constants_1.WEB_PLAYER_ENVS.some((e) => e === env);
 const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) => e === compression);
 main();
@@ -64868,16 +64880,13 @@ function main() {
             const uploadPromises = files.map((file) => r2Uploader.upload(file));
             yield Promise.all(uploadPromises);
             const octokit = github.getOctokit(webPlayerRepoPat);
-            const owner = 'ryanditjia';
-            const repo = 'demo-actions';
             const jsonFilename = constants_1.JSON_BY_ENV[webPlayerEnv];
             const pathToRegistryFile = `${constants_1.REGISTRY_DIR}/${jsonFilename}`;
-            const branch = 'registry';
             const { data: currentFile } = yield octokit.rest.repos.getContent({
-                owner,
-                repo,
+                owner: constants_1.REGISTRY_REPO.OWNER,
+                repo: constants_1.REGISTRY_REPO.NAME,
                 path: pathToRegistryFile,
-                ref: branch,
+                ref: constants_1.REGISTRY_REPO.BRANCH,
             });
             if (Array.isArray(currentFile) || currentFile.type !== 'file') {
                 throw new Error(`Invalid file: ${jsonFilename}`);
@@ -64890,8 +64899,8 @@ function main() {
                 currentJSON,
             });
             const response = yield octokit.rest.repos.createOrUpdateFileContents({
-                owner,
-                repo,
+                owner: constants_1.REGISTRY_REPO.OWNER,
+                repo: constants_1.REGISTRY_REPO.NAME,
                 path: pathToRegistryFile,
                 committer: {
                     name: 'github-actions[bot]',
@@ -64899,11 +64908,11 @@ function main() {
                 },
                 message: `feat: update ${jsonFilename}`,
                 content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
-                branch: branch,
+                branch: constants_1.REGISTRY_REPO.BRANCH,
                 sha: currentFile.sha,
             });
             if (response.status === 200 || response.status === 201) {
-                console.log(updatedJSON);
+                yield (0, post_build_size_to_pr_1.postBuildSizeToPR)(webGLBuildDir, octokit);
             }
             else {
                 throw new Error(`Unable to update ${jsonFilename}`);
@@ -64915,6 +64924,132 @@ function main() {
                 errorMsg = error.message;
             core.setFailed(errorMsg);
         }
+    });
+}
+
+
+/***/ }),
+
+/***/ 3737:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.postBuildSizeToPR = postBuildSizeToPR;
+const github = __importStar(__nccwpck_require__(2819));
+const exec_1 = __nccwpck_require__(8872);
+const fs_1 = __nccwpck_require__(9896);
+const constants_1 = __nccwpck_require__(9316);
+function postBuildSizeToPR(webGLBuildDir, octokit) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        if (github.context.eventName !== 'pull_request')
+            return;
+        const prNumber = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
+        if (!prNumber)
+            return;
+        const buildSize = yield getBuildSize(webGLBuildDir);
+        const body = formatBody(buildSize);
+        const existingComment = yield findExistingComment(octokit, prNumber);
+        if (existingComment) {
+            yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, github.context.repo), { comment_id: existingComment.id, body }));
+        }
+        else {
+            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body }));
+        }
+    });
+}
+function getBuildSize(webGLBuildDir) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const tempFile = 'build_size.txt';
+        yield (0, exec_1.exec)(`du -a -h --max-depth=0 ${webGLBuildDir}/* | sort -hr > ${tempFile}`);
+        const output = (0, fs_1.readFileSync)(tempFile, 'utf8');
+        (0, fs_1.unlinkSync)(tempFile);
+        return output;
+    });
+}
+function formatBody(buildSize) {
+    return `
+### :file_folder: Artifact Build Size Info!
+___
+\`\`\`
+${buildSize}
+\`\`\`
+<!-- ${constants_1.BUILD_SIZE_COMMENT_LANDMARK} -->
+`;
+}
+function findExistingComment(octokit, prNumber) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, e_1, _b, _c;
+        let comment;
+        try {
+            for (var _d = true, _e = __asyncValues(octokit.paginate.iterator(octokit.rest.issues.listComments, Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber }))), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
+                _c = _f.value;
+                _d = false;
+                const { data: comments } = _c;
+                comment = comments.find((comment) => { var _a; return (_a = comment === null || comment === void 0 ? void 0 : comment.body) === null || _a === void 0 ? void 0 : _a.includes(constants_1.BUILD_SIZE_COMMENT_LANDMARK); });
+                if (comment)
+                    break;
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (!_d && !_a && (_b = _e.return)) yield _b.call(_e);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        return comment;
     });
 }
 
