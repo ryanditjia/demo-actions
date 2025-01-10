@@ -19,6 +19,8 @@ const isValidWebPlayerEnv = (env: string): env is keyof typeof JSON_BY_ENV =>
 const isValidCompression = (compression: string): compression is Compression =>
   COMPRESSIONS.some((e) => e === compression)
 
+main()
+
 async function main() {
   try {
     const webPlayerRepoPat = core.getInput('web-player-repo-pat', { required: true })

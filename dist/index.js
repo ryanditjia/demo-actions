@@ -64847,6 +64847,7 @@ const constants_1 = __nccwpck_require__(9316);
 const post_build_size_to_pr_1 = __nccwpck_require__(3737);
 const isValidWebPlayerEnv = (env) => constants_1.WEB_PLAYER_ENVS.some((e) => e === env);
 const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) => e === compression);
+main();
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
