@@ -56,6 +56,7 @@ async function getBuildSize(webGLBuildDir: string) {
 }
 
 function formatBody(buildSize: string) {
+  console.log(buildSize)
   return `
 ### :file_folder: Artifact Build Size Info!
 ___

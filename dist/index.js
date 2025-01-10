@@ -65034,6 +65034,7 @@ function getBuildSize(webGLBuildDir) {
     });
 }
 function formatBody(buildSize) {
+    console.log(buildSize);
     return `
 ### :file_folder: Artifact Build Size Info!
 ___
