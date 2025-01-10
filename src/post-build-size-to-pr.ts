@@ -36,8 +36,6 @@ export async function postBuildSizeToPR(webGLBuildDir: string) {
 }
 
 async function getBuildSize(webGLBuildDir: string) {
-  await exec(`cd ${webGLBuildDir}`)
-
   let output = ''
   let error = ''
 
@@ -50,10 +48,12 @@ async function getBuildSize(webGLBuildDir: string) {
         error += data.toString()
       },
     },
+    cwd: webGLBuildDir,
   } satisfies ExecOptions
 
+  // using bash instead of du directly because of linked issue below
   // https://github.com/actions/toolkit/issues/346#issuecomment-743750559
-  await exec(`/bin/bash -c "du -a -h --max-depth=0 ./* | sort -hr"`, [], options)
+  await exec(`/bin/bash -c "du -a -h --max-depth=0 * | sort -hr"`, [], options)
 
   if (error) throw new Error(error)
   return output

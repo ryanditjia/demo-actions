@@ -65018,7 +65018,6 @@ function postBuildSizeToPR(webGLBuildDir) {
 }
 function getBuildSize(webGLBuildDir) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield (0, exec_1.exec)(`cd ${webGLBuildDir}`);
         let output = '';
         let error = '';
         const options = {
@@ -65030,9 +65029,11 @@ function getBuildSize(webGLBuildDir) {
                     error += data.toString();
                 },
             },
+            cwd: webGLBuildDir,
         };
+        // using bash instead of du directly because of linked issue below
         // https://github.com/actions/toolkit/issues/346#issuecomment-743750559
-        yield (0, exec_1.exec)(`/bin/bash -c "du -a -h --max-depth=0 ./* | sort -hr"`, [], options);
+        yield (0, exec_1.exec)(`/bin/bash -c "du -a -h --max-depth=0 * | sort -hr"`, [], options);
         if (error)
             throw new Error(error);
         return output;
