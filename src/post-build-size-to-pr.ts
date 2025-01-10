@@ -1,19 +1,20 @@
 import * as github from '@actions/github'
+import * as core from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
-import { readFileSync } from 'fs'
 import type { GetResponseDataTypeFromEndpointMethod } from '@octokit/types'
 import { BUILD_SIZE_COMMENT_LANDMARK } from './constants'
 
-export async function postBuildSizeToPR(
-  webGLBuildDir: string,
-  octokit: ReturnType<typeof github.getOctokit>
-) {
+export async function postBuildSizeToPR(webGLBuildDir: string) {
   if (github.context.eventName !== 'pull_request') return
+
   const prNumber = github.context.payload.pull_request?.number
   if (!prNumber) return
 
   const buildSize = await getBuildSize(webGLBuildDir)
   const body = formatBody(buildSize)
+
+  const githubToken = core.getInput('github-token')
+  const octokit = github.getOctokit(githubToken)
 
   const existingComment = await findExistingComment(octokit, prNumber)
 

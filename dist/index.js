@@ -64879,10 +64879,10 @@ function main() {
             const files = yield (0, promises_1.readdir)(webGLBuildDir);
             const uploadPromises = files.map((file) => r2Uploader.upload(file));
             yield Promise.all(uploadPromises);
-            const octokit = github.getOctokit(webPlayerRepoPat);
+            const webPlayerOctokit = github.getOctokit(webPlayerRepoPat);
             const jsonFilename = constants_1.JSON_BY_ENV[webPlayerEnv];
             const pathToRegistryFile = `${constants_1.REGISTRY_DIR}/${jsonFilename}`;
-            const { data: currentFile } = yield octokit.rest.repos.getContent({
+            const { data: currentFile } = yield webPlayerOctokit.rest.repos.getContent({
                 owner: constants_1.REGISTRY_REPO.OWNER,
                 repo: constants_1.REGISTRY_REPO.NAME,
                 path: pathToRegistryFile,
@@ -64898,7 +64898,7 @@ function main() {
                 compression,
                 currentJSON,
             });
-            const response = yield octokit.rest.repos.createOrUpdateFileContents({
+            const response = yield webPlayerOctokit.rest.repos.createOrUpdateFileContents({
                 owner: constants_1.REGISTRY_REPO.OWNER,
                 repo: constants_1.REGISTRY_REPO.NAME,
                 path: pathToRegistryFile,
@@ -64912,7 +64912,7 @@ function main() {
                 sha: currentFile.sha,
             });
             if (response.status === 200 || response.status === 201) {
-                yield (0, post_build_size_to_pr_1.postBuildSizeToPR)(webGLBuildDir, octokit);
+                yield (0, post_build_size_to_pr_1.postBuildSizeToPR)(webGLBuildDir);
             }
             else {
                 throw new Error(`Unable to update ${jsonFilename}`);
@@ -64987,9 +64987,10 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postBuildSizeToPR = postBuildSizeToPR;
 const github = __importStar(__nccwpck_require__(2819));
+const core = __importStar(__nccwpck_require__(9999));
 const exec_1 = __nccwpck_require__(8872);
 const constants_1 = __nccwpck_require__(9316);
-function postBuildSizeToPR(webGLBuildDir, octokit) {
+function postBuildSizeToPR(webGLBuildDir) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
         if (github.context.eventName !== 'pull_request')
@@ -64999,6 +65000,8 @@ function postBuildSizeToPR(webGLBuildDir, octokit) {
             return;
         const buildSize = yield getBuildSize(webGLBuildDir);
         const body = formatBody(buildSize);
+        const githubToken = core.getInput('github-token');
+        const octokit = github.getOctokit(githubToken);
         const existingComment = yield findExistingComment(octokit, prNumber);
         if (existingComment) {
             yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, github.context.repo), { comment_id: existingComment.id, body }));

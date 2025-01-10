@@ -33,6 +33,9 @@ inputs:
   r2-destination-dir:
     description: 'R2 destination directory'
     required: true
+  github-token:
+    description: 'Repository’s GitHub token for posting comments to PRs'
+    default: '${{ github.token }}'
 runs:
   using: 'node20'
   main: 'dist/index.js'

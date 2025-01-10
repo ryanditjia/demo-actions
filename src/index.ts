@@ -3,7 +3,13 @@ import * as github from '@actions/github'
 import { readdir } from 'fs/promises'
 import { R2Uploader } from './r2-uploader'
 import { updateRegistryJSON } from './update-registry-json'
-import { COMPRESSIONS, JSON_BY_ENV, REGISTRY_DIR, REGISTRY_REPO, WEB_PLAYER_ENVS } from './constants'
+import {
+  COMPRESSIONS,
+  JSON_BY_ENV,
+  REGISTRY_DIR,
+  REGISTRY_REPO,
+  WEB_PLAYER_ENVS,
+} from './constants'
 import { postBuildSizeToPR } from './post-build-size-to-pr'
 import type { Compression } from './types'
 
@@ -54,11 +60,11 @@ async function main() {
     const uploadPromises = files.map((file) => r2Uploader.upload(file))
     await Promise.all(uploadPromises)
 
-    const octokit = github.getOctokit(webPlayerRepoPat)
+    const webPlayerOctokit = github.getOctokit(webPlayerRepoPat)
     const jsonFilename = JSON_BY_ENV[webPlayerEnv]
     const pathToRegistryFile = `${REGISTRY_DIR}/${jsonFilename}`
 
-    const { data: currentFile } = await octokit.rest.repos.getContent({
+    const { data: currentFile } = await webPlayerOctokit.rest.repos.getContent({
       owner: REGISTRY_REPO.OWNER,
       repo: REGISTRY_REPO.NAME,
       path: pathToRegistryFile,
@@ -78,7 +84,7 @@ async function main() {
       currentJSON,
     })
 
-    const response = await octokit.rest.repos.createOrUpdateFileContents({
+    const response = await webPlayerOctokit.rest.repos.createOrUpdateFileContents({
       owner: REGISTRY_REPO.OWNER,
       repo: REGISTRY_REPO.NAME,
       path: pathToRegistryFile,
@@ -93,7 +99,7 @@ async function main() {
     })
 
     if (response.status === 200 || response.status === 201) {
-      await postBuildSizeToPR(webGLBuildDir, octokit)
+      await postBuildSizeToPR(webGLBuildDir)
     } else {
       throw new Error(`Unable to update ${jsonFilename}`)
     }
