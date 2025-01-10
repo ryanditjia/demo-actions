@@ -64833,9 +64833,9 @@ const promises_1 = __nccwpck_require__(1943);
 const r2_uploader_1 = __nccwpck_require__(8800);
 const update_registry_json_1 = __nccwpck_require__(8701);
 const constants_1 = __nccwpck_require__(9316);
-main();
 const isValidWebPlayerEnv = (env) => constants_1.WEB_PLAYER_ENVS.some((e) => e === env);
 const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) => e === compression);
+main();
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {

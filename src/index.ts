@@ -6,13 +6,13 @@ import { updateRegistryJSON } from './update-registry-json'
 import { COMPRESSIONS, JSON_BY_ENV, REGISTRY_DIR, WEB_PLAYER_ENVS } from './constants'
 import type { Compression } from './types'
 
-main()
-
 const isValidWebPlayerEnv = (env: string): env is keyof typeof JSON_BY_ENV =>
   WEB_PLAYER_ENVS.some((e) => e === env)
 
 const isValidCompression = (compression: string): compression is Compression =>
   COMPRESSIONS.some((e) => e === compression)
+
+main()
 
 async function main() {
   try {
