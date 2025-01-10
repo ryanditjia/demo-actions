@@ -54,7 +54,7 @@ export class R2Uploader {
       Key: `${this.r2DestinationDir}/${filename}`,
       Body: file,
       ContentType: getContentType(filename),
-      ContentEncoding: 'br',
+      ContentEncoding: 'br', // TODO: make this dynamic
     })
 
     const response = await this.client.send(command)

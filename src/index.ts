@@ -19,7 +19,7 @@ async function main() {
     const webPlayerRepoPat = core.getInput('web-player-repo-pat', { required: true })
     const webPlayerEnv = core.getInput('web-player-env', { required: true })
     const gameName = core.getInput('game-name', { required: true })
-    const compression = core.getInput('compression') || 'none'
+    const compression = core.getInput('compression')
     const webGLBuildDir = core.getInput('webgl-build-dir', { required: true })
     const r2AccessKey = core.getInput('r2-access-key', { required: true })
     const r2SecretKey = core.getInput('r2-secret-key', { required: true })

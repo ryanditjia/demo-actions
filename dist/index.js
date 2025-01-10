@@ -64761,21 +64761,30 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 8800:
-/***/ ((module, __webpack_exports__, __nccwpck_require__) => {
+/***/ 9316:
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   N: () => (/* binding */ R2Uploader)
-/* harmony export */ });
-/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1943);
-/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(fs_promises__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6928);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6933);
-/* harmony import */ var _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__);
-/* module decorator */ module = __nccwpck_require__.hmd(module);
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.JSON_BY_ENV = exports.REGISTRY_DIR = exports.WEB_PLAYER_ENVS = exports.COMPRESSIONS = void 0;
+exports.COMPRESSIONS = ['brotli', 'gzip', 'none'];
+exports.WEB_PLAYER_ENVS = ['production', 'development'];
+exports.REGISTRY_DIR = 'registries';
+exports.JSON_BY_ENV = {
+    production: 'production.json',
+    development: 'development.json',
+};
+
+
+/***/ }),
+
+/***/ 6677:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -64784,9 +64793,126 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core_1 = __importDefault(__nccwpck_require__(9999));
+const github_1 = __importDefault(__nccwpck_require__(2819));
+const promises_1 = __importDefault(__nccwpck_require__(1943));
+const r2_uploader_1 = __nccwpck_require__(8800);
+const update_registry_json_1 = __nccwpck_require__(8701);
+const constants_1 = __nccwpck_require__(9316);
+main();
+const isValidWebPlayerEnv = (env) => constants_1.WEB_PLAYER_ENVS.some((e) => e === env);
+const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) => e === compression);
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const webPlayerRepoPat = core_1.default.getInput('web-player-repo-pat', { required: true });
+            const webPlayerEnv = core_1.default.getInput('web-player-env', { required: true });
+            const gameName = core_1.default.getInput('game-name', { required: true });
+            const compression = core_1.default.getInput('compression');
+            const webGLBuildDir = core_1.default.getInput('webgl-build-dir', { required: true });
+            const r2AccessKey = core_1.default.getInput('r2-access-key', { required: true });
+            const r2SecretKey = core_1.default.getInput('r2-secret-key', { required: true });
+            const r2AccountId = core_1.default.getInput('r2-account-id', { required: true });
+            const r2Bucket = core_1.default.getInput('r2-bucket', { required: true });
+            const r2DestinationDir = core_1.default.getInput('r2-destination-dir', { required: true });
+            const r2CustomDomain = core_1.default.getInput('r2-custom-domain', { required: true });
+            if (!isValidWebPlayerEnv(webPlayerEnv)) {
+                throw new Error(`Invalid web-player-env: ${webPlayerEnv}, must be one of ${constants_1.WEB_PLAYER_ENVS.join(', ')}`);
+            }
+            if (!isValidCompression(compression)) {
+                throw new Error(`Invalid compression: ${compression}, must be one of ${constants_1.COMPRESSIONS.join(', ')}`);
+            }
+            const r2Uploader = new r2_uploader_1.R2Uploader({
+                r2AccessKey,
+                r2SecretKey,
+                r2AccountId,
+                r2Bucket,
+                r2DestinationDir,
+                webGLBuildDir,
+            });
+            const files = yield promises_1.default.readdir(webGLBuildDir);
+            const uploadPromises = files.map((file) => r2Uploader.upload(file));
+            yield Promise.all(uploadPromises);
+            const octokit = github_1.default.getOctokit(webPlayerRepoPat);
+            const owner = 'ryanditjia';
+            const repo = 'demo-actions';
+            const jsonFilename = constants_1.JSON_BY_ENV[webPlayerEnv];
+            const pathToRegistryFile = `${constants_1.REGISTRY_DIR}/${jsonFilename}`;
+            const branch = 'registry';
+            const { data: currentFile } = yield octokit.rest.repos.getContent({
+                owner,
+                repo,
+                path: pathToRegistryFile,
+                ref: branch,
+            });
+            if (Array.isArray(currentFile) || currentFile.type !== 'file') {
+                throw new Error(`Invalid file: ${jsonFilename}`);
+            }
+            const currentJSON = JSON.parse(Buffer.from(currentFile.content, 'base64').toString());
+            const updatedJSON = (0, update_registry_json_1.updateRegistryJSON)({
+                gameName,
+                urlPrefix: `${r2CustomDomain}/${r2DestinationDir}/WebGL`,
+                compression,
+                currentJSON,
+            });
+            const response = yield octokit.rest.repos.createOrUpdateFileContents({
+                owner,
+                repo,
+                path: pathToRegistryFile,
+                committer: {
+                    name: 'github-actions[bot]',
+                    email: 'github-actions[bot]@users.noreply.github.com',
+                },
+                message: `feat: update ${jsonFilename}`,
+                content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
+                branch: branch,
+                sha: currentFile.sha,
+            });
+            if (response.status === 200 || response.status === 201) {
+                console.log(updatedJSON);
+            }
+            else {
+                throw new Error(`Unable to update ${jsonFilename}`);
+            }
+        }
+        catch (error) {
+            let errorMsg = 'Something went wrong';
+            if (error instanceof Error)
+                errorMsg = error.message;
+            core_1.default.setFailed(errorMsg);
+        }
+    });
+}
 
 
+/***/ }),
 
+/***/ 8800:
+/***/ (function(module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.R2Uploader = void 0;
+const promises_1 = __importDefault(__nccwpck_require__(1943));
+const path_1 = __importDefault(__nccwpck_require__(6928));
+const client_s3_1 = __nccwpck_require__(6933);
 const getContentType = (filename) => {
     if (filename.endsWith('.loader.js'))
         return 'application/javascript';
@@ -64803,7 +64929,7 @@ class R2Uploader {
         this.r2Bucket = r2Bucket;
         this.r2DestinationDir = r2DestinationDir;
         this.webGLBuildDir = webGLBuildDir;
-        this.client = new _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__.S3Client({
+        this.client = new client_s3_1.S3Client({
             region: 'auto',
             endpoint: `https://${r2AccountId}.r2.cloudflarestorage.com`,
             credentials: {
@@ -64814,21 +64940,38 @@ class R2Uploader {
     }
     upload(filename) {
         return __awaiter(this, void 0, void 0, function* () {
-            const pathToFile = path__WEBPACK_IMPORTED_MODULE_1___default().join(this.webGLBuildDir, filename);
-            const file = yield fs_promises__WEBPACK_IMPORTED_MODULE_0___default().readFile(pathToFile);
-            const command = new _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__.PutObjectCommand({
+            const pathToFile = path_1.default.join(this.webGLBuildDir, filename);
+            const file = yield promises_1.default.readFile(pathToFile);
+            const command = new client_s3_1.PutObjectCommand({
                 Bucket: this.r2Bucket,
                 Key: `${this.r2DestinationDir}/${filename}`,
                 Body: file,
                 ContentType: getContentType(filename),
-                ContentEncoding: 'br',
+                ContentEncoding: 'br', // TODO: make this dynamic
             });
             const response = yield this.client.send(command);
             console.log(response);
         });
     }
 }
+exports.R2Uploader = R2Uploader;
 module.exports = { R2Uploader };
+
+
+/***/ }),
+
+/***/ 8701:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateRegistryJSON = updateRegistryJSON;
+function updateRegistryJSON({ gameName, urlPrefix, compression, currentJSON, }) {
+    const map = new Map(Object.entries(currentJSON));
+    map.set(gameName, { url_prefix: urlPrefix, compression });
+    return Object.fromEntries(map);
+}
 
 
 /***/ }),
@@ -66760,8 +66903,8 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@aws-sdk/client-sts","descrip
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
@@ -66774,198 +66917,22 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@aws-sdk/client-sts","descrip
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
 /******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/harmony module decorator */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.hmd = (module) => {
-/******/ 			module = Object.create(module);
-/******/ 			if (!module.children) module.children = [];
-/******/ 			Object.defineProperty(module, 'exports', {
-/******/ 				enumerable: true,
-/******/ 				set: () => {
-/******/ 					throw new Error('ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: ' + module.id);
-/******/ 				}
-/******/ 			});
-/******/ 			return module;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-
-// EXTERNAL MODULE: ./node_modules/.pnpm/@actions+core@1.11.1/node_modules/@actions/core/lib/core.js
-var core = __nccwpck_require__(9999);
-var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
-// EXTERNAL MODULE: ./node_modules/.pnpm/@actions+github@6.0.0/node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(2819);
-var github_default = /*#__PURE__*/__nccwpck_require__.n(github);
-// EXTERNAL MODULE: external "fs/promises"
-var promises_ = __nccwpck_require__(1943);
-var promises_default = /*#__PURE__*/__nccwpck_require__.n(promises_);
-// EXTERNAL MODULE: ./src/r2-uploader.ts
-var r2_uploader = __nccwpck_require__(8800);
-;// CONCATENATED MODULE: ./src/update-registry-json.ts
-function updateRegistryJSON({ gameName, urlPrefix, compression, currentJSON, }) {
-    const map = new Map(Object.entries(currentJSON));
-    map.set(gameName, { url_prefix: urlPrefix, compression });
-    return Object.fromEntries(map);
-}
-
-;// CONCATENATED MODULE: ./src/constants.ts
-const COMPRESSIONS = ['brotli', 'gzip', 'none'];
-const WEB_PLAYER_ENVS = ['production', 'development'];
-const REGISTRY_DIR = 'registries';
-const JSON_BY_ENV = {
-    production: 'production.json',
-    development: 'development.json',
-};
-
-;// CONCATENATED MODULE: ./src/index.ts
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-
-
-
-
-
-
-main();
-const isValidWebPlayerEnv = (env) => WEB_PLAYER_ENVS.some((e) => e === env);
-const isValidCompression = (compression) => COMPRESSIONS.some((e) => e === compression);
-function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const webPlayerRepoPat = core_default().getInput('web-player-repo-pat', { required: true });
-            const webPlayerEnv = core_default().getInput('web-player-env', { required: true });
-            const gameName = core_default().getInput('game-name', { required: true });
-            const compression = core_default().getInput('compression') || 'none';
-            const webGLBuildDir = core_default().getInput('webgl-build-dir', { required: true });
-            const r2AccessKey = core_default().getInput('r2-access-key', { required: true });
-            const r2SecretKey = core_default().getInput('r2-secret-key', { required: true });
-            const r2AccountId = core_default().getInput('r2-account-id', { required: true });
-            const r2Bucket = core_default().getInput('r2-bucket', { required: true });
-            const r2DestinationDir = core_default().getInput('r2-destination-dir', { required: true });
-            const r2CustomDomain = core_default().getInput('r2-custom-domain', { required: true });
-            if (!isValidWebPlayerEnv(webPlayerEnv)) {
-                throw new Error(`Invalid web-player-env: ${webPlayerEnv}, must be one of ${WEB_PLAYER_ENVS.join(', ')}`);
-            }
-            if (!isValidCompression(compression)) {
-                throw new Error(`Invalid compression: ${compression}, must be one of ${COMPRESSIONS.join(', ')}`);
-            }
-            const r2Uploader = new r2_uploader/* R2Uploader */.N({
-                r2AccessKey,
-                r2SecretKey,
-                r2AccountId,
-                r2Bucket,
-                r2DestinationDir,
-                webGLBuildDir,
-            });
-            const files = yield promises_default().readdir(webGLBuildDir);
-            const uploadPromises = files.map((file) => r2Uploader.upload(file));
-            yield Promise.all(uploadPromises);
-            const octokit = github_default().getOctokit(webPlayerRepoPat);
-            const owner = 'ryanditjia';
-            const repo = 'demo-actions';
-            const jsonFilename = JSON_BY_ENV[webPlayerEnv];
-            const pathToRegistryFile = `${REGISTRY_DIR}/${jsonFilename}`;
-            const branch = 'registry';
-            const { data: currentFile } = yield octokit.rest.repos.getContent({
-                owner,
-                repo,
-                path: pathToRegistryFile,
-                ref: branch,
-            });
-            if (Array.isArray(currentFile) || currentFile.type !== 'file') {
-                throw new Error(`Invalid file: ${jsonFilename}`);
-            }
-            const currentJSON = JSON.parse(Buffer.from(currentFile.content, 'base64').toString());
-            const updatedJSON = updateRegistryJSON({
-                gameName,
-                urlPrefix: `${r2CustomDomain}/${r2DestinationDir}/WebGL`,
-                compression,
-                currentJSON,
-            });
-            const response = yield octokit.rest.repos.createOrUpdateFileContents({
-                owner,
-                repo,
-                path: pathToRegistryFile,
-                committer: {
-                    name: 'github-actions[bot]',
-                    email: 'github-actions[bot]@users.noreply.github.com',
-                },
-                message: `feat: update ${jsonFilename}`,
-                content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
-                branch: branch,
-                sha: currentFile.sha,
-            });
-            if (response.status === 200 || response.status === 201) {
-                console.log(updatedJSON);
-            }
-            else {
-                throw new Error(`Unable to update ${jsonFilename}`);
-            }
-        }
-        catch (error) {
-            let errorMsg = 'Something went wrong';
-            if (error instanceof Error)
-                errorMsg = error.message;
-            core_default().setFailed(errorMsg);
-        }
-    });
-}
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(6677);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;
