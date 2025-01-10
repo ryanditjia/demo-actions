@@ -65001,7 +65001,7 @@ function postBuildSizeToPR(webGLBuildDir) {
         const buildSize = yield getBuildSize(webGLBuildDir);
         const body = formatBody(buildSize);
         const githubToken = core.getInput('github-token');
-        const octokit = github.getOctokit(githubToken);
+        const octokit = github.getOctokit('');
         const existingComment = yield findExistingComment(octokit, prNumber);
         if (existingComment) {
             yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, github.context.repo), { comment_id: existingComment.id, body }));
