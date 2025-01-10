@@ -47,6 +47,10 @@ async function main() {
       )
     }
 
+    /**
+     * Upload build files to R2
+     */
+
     const r2Uploader = new R2Uploader({
       r2AccessKey,
       r2SecretKey,
@@ -60,6 +64,10 @@ async function main() {
     const files = await readdir(webGLBuildDir)
     const uploadPromises = files.map((file) => r2Uploader.upload(file))
     await Promise.all(uploadPromises)
+
+    /**
+     * Update registry JSON file
+     */
 
     const webPlayerOctokit = github.getOctokit(webPlayerRepoPat)
     const jsonFilename = JSON_BY_ENV[webPlayerEnv]
@@ -102,6 +110,7 @@ async function main() {
     if (response.status === 200 || response.status === 201) {
       console.log(`📒 Updated ${jsonFilename} in registry:`)
       console.log(updatedJSON)
+
       await postBuildSizeToPR(webGLBuildDir)
     } else {
       throw new Error(`Unable to update ${jsonFilename}`)

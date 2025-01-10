@@ -64868,6 +64868,9 @@ function main() {
             if (!isValidCompression(compression)) {
                 throw new Error(`Invalid compression: ${compression}, must be one of ${constants_1.COMPRESSIONS.join(', ')}`);
             }
+            /**
+             * Upload build files to R2
+             */
             const r2Uploader = new r2_uploader_1.R2Uploader({
                 r2AccessKey,
                 r2SecretKey,
@@ -64880,6 +64883,9 @@ function main() {
             const files = yield (0, promises_1.readdir)(webGLBuildDir);
             const uploadPromises = files.map((file) => r2Uploader.upload(file));
             yield Promise.all(uploadPromises);
+            /**
+             * Update registry JSON file
+             */
             const webPlayerOctokit = github.getOctokit(webPlayerRepoPat);
             const jsonFilename = constants_1.JSON_BY_ENV[webPlayerEnv];
             const pathToRegistryFile = `${constants_1.REGISTRY_DIR}/${jsonFilename}`;
@@ -65077,7 +65083,7 @@ function findExistingComment(octokit, prNumber) {
 /***/ }),
 
 /***/ 8800:
-/***/ (function(module, exports, __nccwpck_require__) {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
@@ -65095,17 +65101,6 @@ exports.R2Uploader = void 0;
 const promises_1 = __nccwpck_require__(1943);
 const path_1 = __nccwpck_require__(6928);
 const client_s3_1 = __nccwpck_require__(6933);
-const getContentType = (filename) => {
-    if (filename.endsWith('.loader.js'))
-        return 'application/javascript';
-    if (filename.endsWith('.framework.js.br'))
-        return 'application/javascript';
-    if (filename.endsWith('.wasm.br'))
-        return 'application/wasm';
-    if (filename.endsWith('.data.br'))
-        return 'text/plain';
-    throw new Error(`Unsupported file type for ${filename}`);
-};
 class R2Uploader {
     constructor({ r2AccessKey, r2SecretKey, r2AccountId, r2Bucket, r2DestinationDir, webGLBuildDir, compression, }) {
         this.r2Bucket = r2Bucket;
@@ -65147,7 +65142,17 @@ class R2Uploader {
     }
 }
 exports.R2Uploader = R2Uploader;
-module.exports = { R2Uploader };
+function getContentType(filename) {
+    if (filename.endsWith('.loader.js'))
+        return 'application/javascript';
+    if (filename.endsWith('.framework.js.br'))
+        return 'application/javascript';
+    if (filename.endsWith('.wasm.br'))
+        return 'application/wasm';
+    if (filename.endsWith('.data.br'))
+        return 'text/plain';
+    throw new Error(`Unsupported file type for ${filename}`);
+}
 
 
 /***/ }),

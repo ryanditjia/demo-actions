@@ -3,14 +3,6 @@ import { join } from 'path'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import type { Compression } from './types'
 
-const getContentType = (filename: string) => {
-  if (filename.endsWith('.loader.js')) return 'application/javascript'
-  if (filename.endsWith('.framework.js.br')) return 'application/javascript'
-  if (filename.endsWith('.wasm.br')) return 'application/wasm'
-  if (filename.endsWith('.data.br')) return 'text/plain'
-  throw new Error(`Unsupported file type for ${filename}`)
-}
-
 export class R2Uploader {
   private r2Bucket: string
   private r2DestinationDir: string
@@ -76,4 +68,10 @@ export class R2Uploader {
   }
 }
 
-module.exports = { R2Uploader }
+function getContentType(filename: string) {
+  if (filename.endsWith('.loader.js')) return 'application/javascript'
+  if (filename.endsWith('.framework.js.br')) return 'application/javascript'
+  if (filename.endsWith('.wasm.br')) return 'application/wasm'
+  if (filename.endsWith('.data.br')) return 'text/plain'
+  throw new Error(`Unsupported file type for ${filename}`)
+}
