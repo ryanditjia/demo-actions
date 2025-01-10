@@ -64988,7 +64988,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.postBuildSizeToPR = postBuildSizeToPR;
 const github = __importStar(__nccwpck_require__(2819));
 const exec_1 = __nccwpck_require__(8872);
-const fs_1 = __nccwpck_require__(9896);
 const constants_1 = __nccwpck_require__(9316);
 function postBuildSizeToPR(webGLBuildDir, octokit) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -65011,13 +65010,22 @@ function postBuildSizeToPR(webGLBuildDir, octokit) {
 }
 function getBuildSize(webGLBuildDir) {
     return __awaiter(this, void 0, void 0, function* () {
-        const tempFile = 'build_size.txt';
-        yield (0, exec_1.exec)(`tree build`);
-        yield (0, exec_1.exec)(`tree ./build`);
-        yield (0, exec_1.exec)(`tree ${webGLBuildDir}`);
-        yield (0, exec_1.exec)(`du -a -h --max-depth=0 ${webGLBuildDir}/* > ${tempFile}`);
-        const output = (0, fs_1.readFileSync)(tempFile, 'utf8');
-        (0, fs_1.unlinkSync)(tempFile);
+        let output = '';
+        let error = '';
+        const options = {
+            listeners: {
+                stdout: (data) => {
+                    output += data.toString();
+                },
+                stderr: (data) => {
+                    error += data.toString();
+                },
+            },
+        };
+        // https://github.com/actions/toolkit/issues/346#issuecomment-743750559
+        yield (0, exec_1.exec)(`/bin/bash -c "du -a -h --max-depth=0 ${webGLBuildDir}/* | sort -hr"`, [], options);
+        if (error)
+            throw new Error(error);
         return output;
     });
 }

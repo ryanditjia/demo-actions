@@ -1,6 +1,6 @@
 import * as github from '@actions/github'
-import { exec } from '@actions/exec'
-import { readFileSync, unlinkSync } from 'fs'
+import { exec, ExecOptions } from '@actions/exec'
+import { readFileSync } from 'fs'
 import type { GetResponseDataTypeFromEndpointMethod } from '@octokit/types'
 import { BUILD_SIZE_COMMENT_LANDMARK } from './constants'
 
@@ -33,13 +33,24 @@ export async function postBuildSizeToPR(
 }
 
 async function getBuildSize(webGLBuildDir: string) {
-  const tempFile = 'build_size.txt'
-  await exec(`tree build`)
-  await exec(`tree ./build`)
-  await exec(`tree ${webGLBuildDir}`)
-  await exec(`du -a -h --max-depth=0 ${webGLBuildDir}/* > ${tempFile}`)
-  const output = readFileSync(tempFile, 'utf8')
-  unlinkSync(tempFile)
+  let output = ''
+  let error = ''
+
+  const options: ExecOptions = {
+    listeners: {
+      stdout: (data: Buffer) => {
+        output += data.toString()
+      },
+      stderr: (data: Buffer) => {
+        error += data.toString()
+      },
+    },
+  }
+
+  // https://github.com/actions/toolkit/issues/346#issuecomment-743750559
+  await exec(`/bin/bash -c "du -a -h --max-depth=0 ${webGLBuildDir}/* | sort -hr"`, [], options)
+
+  if (error) throw new Error(error)
   return output
 }
 
