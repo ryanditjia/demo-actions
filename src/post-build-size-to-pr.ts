@@ -34,6 +34,9 @@ export async function postBuildSizeToPR(
 
 async function getBuildSize(webGLBuildDir: string) {
   const tempFile = 'build_size.txt'
+  await exec(`tree build`)
+  await exec(`tree ./build`)
+  await exec(`tree ${webGLBuildDir}`)
   await exec(`du -a -h --max-depth=0 ${webGLBuildDir}/* > ${tempFile}`)
   const output = readFileSync(tempFile, 'utf8')
   unlinkSync(tempFile)
