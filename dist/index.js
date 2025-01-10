@@ -64874,6 +64874,7 @@ function main() {
                 r2Bucket,
                 r2DestinationDir,
                 webGLBuildDir,
+                compression,
             });
             const files = yield (0, promises_1.readdir)(webGLBuildDir);
             const uploadPromises = files.map((file) => r2Uploader.upload(file));
@@ -65100,10 +65101,11 @@ const getContentType = (filename) => {
     throw new Error(`Unsupported file type for ${filename}`);
 };
 class R2Uploader {
-    constructor({ r2AccessKey, r2SecretKey, r2AccountId, r2Bucket, r2DestinationDir, webGLBuildDir, }) {
+    constructor({ r2AccessKey, r2SecretKey, r2AccountId, r2Bucket, r2DestinationDir, webGLBuildDir, compression, }) {
         this.r2Bucket = r2Bucket;
         this.r2DestinationDir = r2DestinationDir;
         this.webGLBuildDir = webGLBuildDir;
+        this.compression = compression;
         this.client = new client_s3_1.S3Client({
             region: 'auto',
             endpoint: `https://${r2AccountId}.r2.cloudflarestorage.com`,
@@ -65122,8 +65124,13 @@ class R2Uploader {
                 Key: `${this.r2DestinationDir}/${filename}`,
                 Body: file,
                 ContentType: getContentType(filename),
-                ContentEncoding: 'br', // TODO: make this dynamic
             });
+            if (this.compression === 'brotli') {
+                command.input.ContentEncoding = 'br';
+            }
+            else if (this.compression === 'gzip') {
+                command.input.ContentEncoding = 'gzip';
+            }
             const response = yield this.client.send(command);
             console.log(response);
         });

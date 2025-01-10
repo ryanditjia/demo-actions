@@ -52,6 +52,7 @@ async function main() {
       r2Bucket,
       r2DestinationDir,
       webGLBuildDir,
+      compression,
     })
 
     const files = await readdir(webGLBuildDir)

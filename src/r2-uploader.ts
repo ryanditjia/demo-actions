@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import type { Compression } from './types'
 
 const getContentType = (filename: string) => {
   if (filename.endsWith('.loader.js')) return 'application/javascript'
@@ -15,6 +16,7 @@ export class R2Uploader {
   private r2DestinationDir: string
   private webGLBuildDir: string
   private client: S3Client
+  private compression: Compression
 
   constructor({
     r2AccessKey,
@@ -23,6 +25,7 @@ export class R2Uploader {
     r2Bucket,
     r2DestinationDir,
     webGLBuildDir,
+    compression,
   }: {
     r2AccessKey: string
     r2SecretKey: string
@@ -30,10 +33,12 @@ export class R2Uploader {
     r2Bucket: string
     r2DestinationDir: string
     webGLBuildDir: string
+    compression: Compression
   }) {
     this.r2Bucket = r2Bucket
     this.r2DestinationDir = r2DestinationDir
     this.webGLBuildDir = webGLBuildDir
+    this.compression = compression
 
     this.client = new S3Client({
       region: 'auto',
@@ -54,8 +59,13 @@ export class R2Uploader {
       Key: `${this.r2DestinationDir}/${filename}`,
       Body: file,
       ContentType: getContentType(filename),
-      ContentEncoding: 'br', // TODO: make this dynamic
     })
+
+    if (this.compression === 'brotli') {
+      command.input.ContentEncoding = 'br'
+    } else if (this.compression === 'gzip') {
+      command.input.ContentEncoding = 'gzip'
+    }
 
     const response = await this.client.send(command)
     console.log(response)
