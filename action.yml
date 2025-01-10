@@ -35,7 +35,7 @@ inputs:
     required: true
   github-token:
     description: 'Repository’s GitHub token for posting comments to PRs'
-    default: '${{ github.token }}'
+    default: ${{ github.token }}
 runs:
   using: 'node20'
   main: 'dist/index.js'
