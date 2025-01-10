@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { updateRegistryJSON } from './update-json'
+import { updateRegistryJSON } from './update-registry-json'
+import type { Registry } from './types'
 
 const currentJSON = {
   blocksurvivor: {
@@ -10,7 +11,7 @@ const currentJSON = {
     url_prefix: 'https://cdn.anothergame.com/old1234/WebGL',
     compression: 'brotli',
   },
-}
+} satisfies Registry
 
 describe('updateRegistryJSON', () => {
   it('should update in-place if existing game', () => {
@@ -20,7 +21,7 @@ describe('updateRegistryJSON', () => {
       gameName: 'blocksurvivor',
       urlPrefix: newUrlPrefix,
       compression: 'brotli',
-      currentJSON: currentJSON,
+      currentJSON,
     })
 
     expect(updatedJSON).toEqual({

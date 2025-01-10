@@ -9,6 +9,9 @@ inputs:
   game-name:
     description: 'Game name being uploaded. Example: blocksurvivor'
     required: true
+  compression:
+    description: 'Compression used for the build. Example: brotli | gzip | none.'
+    default: 'brotli'
   webgl-build-dir:
     description: 'Path to the WebGL build directory. Example: ./build/WebGL/WebGL/Build'
     required: true
@@ -23,6 +26,9 @@ inputs:
     required: true
   r2-bucket:
     description: 'R2 bucket'
+    required: true
+  r2-custom-domain:
+    description: 'R2 custom domain'
     required: true
   r2-destination-dir:
     description: 'R2 destination directory'

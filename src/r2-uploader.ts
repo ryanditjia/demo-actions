@@ -1,8 +1,8 @@
-const fs = require('fs/promises')
-const path = require('path')
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
+import fs from 'fs/promises'
+import path from 'path'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
-const getContentType = (filename) => {
+const getContentType = (filename: string) => {
   if (filename.endsWith('.loader.js')) return 'application/javascript'
   if (filename.endsWith('.framework.js.br')) return 'application/javascript'
   if (filename.endsWith('.wasm.br')) return 'application/wasm'
@@ -10,7 +10,12 @@ const getContentType = (filename) => {
   throw new Error(`Unsupported file type for ${filename}`)
 }
 
-class R2Uploader {
+export class R2Uploader {
+  private r2Bucket: string
+  private r2DestinationDir: string
+  private webGLBuildDir: string
+  private client: S3Client
+
   constructor({
     r2AccessKey,
     r2SecretKey,
@@ -18,6 +23,13 @@ class R2Uploader {
     r2Bucket,
     r2DestinationDir,
     webGLBuildDir,
+  }: {
+    r2AccessKey: string
+    r2SecretKey: string
+    r2AccountId: string
+    r2Bucket: string
+    r2DestinationDir: string
+    webGLBuildDir: string
   }) {
     this.r2Bucket = r2Bucket
     this.r2DestinationDir = r2DestinationDir
@@ -33,7 +45,7 @@ class R2Uploader {
     })
   }
 
-  async upload(filename) {
+  async upload(filename: string) {
     const pathToFile = path.join(this.webGLBuildDir, filename)
     const file = await fs.readFile(pathToFile)
 

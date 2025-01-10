@@ -41116,31 +41116,6 @@ module.exports = toNumber
 
 /***/ }),
 
-/***/ 5419:
-/***/ ((module) => {
-
-"use strict";
-
-
-var isProduction = process.env.NODE_ENV === 'production';
-var prefix = 'Invariant failed';
-function invariant(condition, message) {
-    if (condition) {
-        return;
-    }
-    if (isProduction) {
-        throw new Error(prefix);
-    }
-    var provided = typeof message === 'function' ? message() : message;
-    var value = provided ? "".concat(prefix, ": ").concat(provided) : prefix;
-    throw new Error(value);
-}
-
-module.exports = invariant;
-
-
-/***/ }),
-
 /***/ 1577:
 /***/ ((module) => {
 
@@ -64786,88 +64761,74 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 8991:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-const fs = __nccwpck_require__(1943)
-const path = __nccwpck_require__(6928)
-const { S3Client, PutObjectCommand } = __nccwpck_require__(6933)
-
-const getContentType = (filename) => {
-  if (filename.endsWith('.loader.js')) return 'application/javascript'
-  if (filename.endsWith('.framework.js.br')) return 'application/javascript'
-  if (filename.endsWith('.wasm.br')) return 'application/wasm'
-  if (filename.endsWith('.data.br')) return 'text/plain'
-  throw new Error(`Unsupported file type for ${filename}`)
-}
-
-class R2Uploader {
-  constructor({
-    r2AccessKey,
-    r2SecretKey,
-    r2AccountId,
-    r2Bucket,
-    r2DestinationDir,
-    webGLBuildDir,
-  }) {
-    this.r2Bucket = r2Bucket
-    this.r2DestinationDir = r2DestinationDir
-    this.webGLBuildDir = webGLBuildDir
-
-    this.client = new S3Client({
-      region: 'auto',
-      endpoint: `https://${r2AccountId}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: r2AccessKey,
-        secretAccessKey: r2SecretKey,
-      },
-    })
-  }
-
-  async upload(filename) {
-    const pathToFile = path.join(this.webGLBuildDir, filename)
-    const file = await fs.readFile(pathToFile)
-
-    const command = new PutObjectCommand({
-      Bucket: this.r2Bucket,
-      Key: `${this.r2DestinationDir}/${filename}`,
-      Body: file,
-      ContentType: getContentType(filename),
-      ContentEncoding: 'br',
-    })
-
-    const response = await this.client.send(command)
-    console.log(response)
-  }
-}
-
-module.exports = { R2Uploader }
-
-
-/***/ }),
-
-/***/ 5028:
-/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+/***/ 8800:
+/***/ ((module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
-__nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   updateRegistryJSON: () => (/* binding */ updateRegistryJSON)
+/* harmony export */   N: () => (/* binding */ R2Uploader)
 /* harmony export */ });
-/**
- * @param {Object} options
- * @param {string} options.gameName
- * @param {string} options.urlPrefix
- * @param {string} options.compression
- * @param {import("./types").Registry} options.currentJSON
- *
- * @returns {import("./types").Registry}
- */
-function updateRegistryJSON({ gameName, urlPrefix, compression, currentJSON }) {
-  const map = new Map(Object.entries(currentJSON))
-  map.set(gameName, { url_prefix: urlPrefix, compression })
-  return Object.fromEntries(map)
+/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1943);
+/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(fs_promises__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(6928);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(6933);
+/* harmony import */ var _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__);
+/* module decorator */ module = __nccwpck_require__.hmd(module);
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+const getContentType = (filename) => {
+    if (filename.endsWith('.loader.js'))
+        return 'application/javascript';
+    if (filename.endsWith('.framework.js.br'))
+        return 'application/javascript';
+    if (filename.endsWith('.wasm.br'))
+        return 'application/wasm';
+    if (filename.endsWith('.data.br'))
+        return 'text/plain';
+    throw new Error(`Unsupported file type for ${filename}`);
+};
+class R2Uploader {
+    constructor({ r2AccessKey, r2SecretKey, r2AccountId, r2Bucket, r2DestinationDir, webGLBuildDir, }) {
+        this.r2Bucket = r2Bucket;
+        this.r2DestinationDir = r2DestinationDir;
+        this.webGLBuildDir = webGLBuildDir;
+        this.client = new _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__.S3Client({
+            region: 'auto',
+            endpoint: `https://${r2AccountId}.r2.cloudflarestorage.com`,
+            credentials: {
+                accessKeyId: r2AccessKey,
+                secretAccessKey: r2SecretKey,
+            },
+        });
+    }
+    upload(filename) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const pathToFile = path__WEBPACK_IMPORTED_MODULE_1___default().join(this.webGLBuildDir, filename);
+            const file = yield fs_promises__WEBPACK_IMPORTED_MODULE_0___default().readFile(pathToFile);
+            const command = new _aws_sdk_client_s3__WEBPACK_IMPORTED_MODULE_2__.PutObjectCommand({
+                Bucket: this.r2Bucket,
+                Key: `${this.r2DestinationDir}/${filename}`,
+                Body: file,
+                ContentType: getContentType(filename),
+                ContentEncoding: 'br',
+            });
+            const response = yield this.client.send(command);
+            console.log(response);
+        });
+    }
 }
+module.exports = { R2Uploader };
 
 
 /***/ }),
@@ -66799,8 +66760,8 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@aws-sdk/client-sts","descrip
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
+/******/ 			id: moduleId,
+/******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
@@ -66813,11 +66774,26 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@aws-sdk/client-sts","descrip
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
 /******/ 	
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -66830,20 +66806,24 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@aws-sdk/client-sts","descrip
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/harmony module decorator */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.hmd = (module) => {
+/******/ 			module = Object.create(module);
+/******/ 			if (!module.children) module.children = [];
+/******/ 			Object.defineProperty(module, 'exports', {
+/******/ 				enumerable: true,
+/******/ 				set: () => {
+/******/ 					throw new Error('ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: ' + module.id);
+/******/ 				}
+/******/ 			});
+/******/ 			return module;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/compat */
@@ -66852,98 +66832,139 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"@aws-sdk/client-sts","descrip
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-const core = __nccwpck_require__(9999)
-const github = __nccwpck_require__(2819)
-const invariant = __nccwpck_require__(5419)
-const fs = __nccwpck_require__(1943)
-const { R2Uploader } = __nccwpck_require__(8991)
-const { updateRegistryJSON } = __nccwpck_require__(5028)
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
 
-const envs = ['production', 'development']
-const jsonByEnv = {
-  production: 'production.json',
-  development: 'development.json',
+// EXTERNAL MODULE: ./node_modules/.pnpm/@actions+core@1.11.1/node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(9999);
+var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
+// EXTERNAL MODULE: ./node_modules/.pnpm/@actions+github@6.0.0/node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(2819);
+var github_default = /*#__PURE__*/__nccwpck_require__.n(github);
+// EXTERNAL MODULE: external "fs/promises"
+var promises_ = __nccwpck_require__(1943);
+var promises_default = /*#__PURE__*/__nccwpck_require__.n(promises_);
+// EXTERNAL MODULE: ./src/r2-uploader.ts
+var r2_uploader = __nccwpck_require__(8800);
+;// CONCATENATED MODULE: ./src/update-registry-json.ts
+function updateRegistryJSON({ gameName, urlPrefix, compression, currentJSON, }) {
+    const map = new Map(Object.entries(currentJSON));
+    map.set(gameName, { url_prefix: urlPrefix, compression });
+    return Object.fromEntries(map);
 }
 
-main()
+;// CONCATENATED MODULE: ./src/constants.ts
+const COMPRESSIONS = ['brotli', 'gzip', 'none'];
+const WEB_PLAYER_ENVS = ['production', 'development'];
+const REGISTRY_DIR = 'registries';
+const JSON_BY_ENV = {
+    production: 'production.json',
+    development: 'development.json',
+};
 
-async function main() {
-  try {
-    const webPlayerRepoPat = core.getInput('web-player-repo-pat', { required: true })
-    const webPlayerEnv = core.getInput('web-player-env', { required: true })
-    const gameName = core.getInput('game-name', { required: true })
-    const webGLBuildDir = core.getInput('webgl-build-dir', { required: true })
-    const r2AccessKey = core.getInput('r2-access-key', { required: true })
-    const r2SecretKey = core.getInput('r2-secret-key', { required: true })
-    const r2AccountId = core.getInput('r2-account-id', { required: true })
-    const r2Bucket = core.getInput('r2-bucket', { required: true })
-    const r2DestinationDir = core.getInput('r2-destination-dir', { required: true })
+;// CONCATENATED MODULE: ./src/index.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
-    invariant(
-      envs.includes(webPlayerEnv),
-      `Invalid web-player-env: ${webPlayerEnv}, must be one of ${envs.join(', ')}`
-    )
 
-    const r2Uploader = new R2Uploader({
-      r2AccessKey,
-      r2SecretKey,
-      r2AccountId,
-      r2Bucket,
-      r2DestinationDir,
-      webGLBuildDir,
-    })
 
-    const files = await fs.readdir(webGLBuildDir)
 
-    const uploadPromises = files.map((file) => r2Uploader.upload(file))
-    await Promise.all(uploadPromises)
 
-    const octokit = github.getOctokit(webPlayerRepoPat)
 
-    const owner = 'ryanditjia'
-    const repo = 'demo-actions'
-    const jsonFilename = jsonByEnv[webPlayerEnv]
-    const branch = 'registry'
-
-    const { data: currentFile } = await octokit.rest.repos.getContent({
-      owner,
-      repo,
-      path: jsonFilename,
-      ref: branch,
-    })
-
-    const currentJSON = JSON.parse(Buffer.from(currentFile.content, 'base64').toString())
-
-    const updatedJSON = updateRegistryJSON({
-      gameName,
-      urlPrefix,
-      compression,
-      currentJSON,
-    })
-
-    const response = await octokit.rest.repos.createOrUpdateFileContents({
-      owner,
-      repo,
-      path: jsonFilename,
-      committer: {
-        name: 'github-actions[bot]',
-        email: 'github-actions[bot]@users.noreply.github.com',
-      },
-      message: `feat: update ${jsonFilename}`,
-      content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
-      branch: branch,
-      sha: currentFile.sha,
-    })
-
-    if (response.status === 200 || response.status === 201) {
-      console.log(updatedJSON)
-    } else {
-      throw new Error(`Failed to update ${jsonFilename}: ${response.status}`)
-    }
-  } catch (error) {
-    core.setFailed(error.message)
-  }
+main();
+const isValidWebPlayerEnv = (env) => WEB_PLAYER_ENVS.some((e) => e === env);
+const isValidCompression = (compression) => COMPRESSIONS.some((e) => e === compression);
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const webPlayerRepoPat = core_default().getInput('web-player-repo-pat', { required: true });
+            const webPlayerEnv = core_default().getInput('web-player-env', { required: true });
+            const gameName = core_default().getInput('game-name', { required: true });
+            const compression = core_default().getInput('compression') || 'none';
+            const webGLBuildDir = core_default().getInput('webgl-build-dir', { required: true });
+            const r2AccessKey = core_default().getInput('r2-access-key', { required: true });
+            const r2SecretKey = core_default().getInput('r2-secret-key', { required: true });
+            const r2AccountId = core_default().getInput('r2-account-id', { required: true });
+            const r2Bucket = core_default().getInput('r2-bucket', { required: true });
+            const r2DestinationDir = core_default().getInput('r2-destination-dir', { required: true });
+            const r2CustomDomain = core_default().getInput('r2-custom-domain', { required: true });
+            if (!isValidWebPlayerEnv(webPlayerEnv)) {
+                throw new Error(`Invalid web-player-env: ${webPlayerEnv}, must be one of ${WEB_PLAYER_ENVS.join(', ')}`);
+            }
+            if (!isValidCompression(compression)) {
+                throw new Error(`Invalid compression: ${compression}, must be one of ${COMPRESSIONS.join(', ')}`);
+            }
+            const r2Uploader = new r2_uploader/* R2Uploader */.N({
+                r2AccessKey,
+                r2SecretKey,
+                r2AccountId,
+                r2Bucket,
+                r2DestinationDir,
+                webGLBuildDir,
+            });
+            const files = yield promises_default().readdir(webGLBuildDir);
+            const uploadPromises = files.map((file) => r2Uploader.upload(file));
+            yield Promise.all(uploadPromises);
+            const octokit = github_default().getOctokit(webPlayerRepoPat);
+            const owner = 'ryanditjia';
+            const repo = 'demo-actions';
+            const jsonFilename = JSON_BY_ENV[webPlayerEnv];
+            const pathToRegistryFile = `${REGISTRY_DIR}/${jsonFilename}`;
+            const branch = 'registry';
+            const { data: currentFile } = yield octokit.rest.repos.getContent({
+                owner,
+                repo,
+                path: pathToRegistryFile,
+                ref: branch,
+            });
+            if (Array.isArray(currentFile) || currentFile.type !== 'file') {
+                throw new Error(`Invalid file: ${jsonFilename}`);
+            }
+            const currentJSON = JSON.parse(Buffer.from(currentFile.content, 'base64').toString());
+            const updatedJSON = updateRegistryJSON({
+                gameName,
+                urlPrefix: `${r2CustomDomain}/${r2DestinationDir}/WebGL`,
+                compression,
+                currentJSON,
+            });
+            const response = yield octokit.rest.repos.createOrUpdateFileContents({
+                owner,
+                repo,
+                path: pathToRegistryFile,
+                committer: {
+                    name: 'github-actions[bot]',
+                    email: 'github-actions[bot]@users.noreply.github.com',
+                },
+                message: `feat: update ${jsonFilename}`,
+                content: Buffer.from(JSON.stringify(updatedJSON, null, 2)).toString('base64'),
+                branch: branch,
+                sha: currentFile.sha,
+            });
+            if (response.status === 200 || response.status === 201) {
+                console.log(updatedJSON);
+            }
+            else {
+                throw new Error(`Unable to update ${jsonFilename}`);
+            }
+        }
+        catch (error) {
+            let errorMsg = 'Something went wrong';
+            if (error instanceof Error)
+                errorMsg = error.message;
+            core_default().setFailed(errorMsg);
+        }
+    });
 }
+
+})();
 
 module.exports = __webpack_exports__;
 /******/ })()
