@@ -1,5 +1,5 @@
-import fs from 'fs/promises'
-import path from 'path'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
 const getContentType = (filename: string) => {
@@ -46,8 +46,8 @@ export class R2Uploader {
   }
 
   async upload(filename: string) {
-    const pathToFile = path.join(this.webGLBuildDir, filename)
-    const file = await fs.readFile(pathToFile)
+    const pathToFile = join(this.webGLBuildDir, filename)
+    const file = await readFile(pathToFile)
 
     const command = new PutObjectCommand({
       Bucket: this.r2Bucket,

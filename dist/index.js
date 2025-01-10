@@ -64784,6 +64784,39 @@ exports.JSON_BY_ENV = {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -64793,13 +64826,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__nccwpck_require__(9999));
-const github_1 = __importDefault(__nccwpck_require__(2819));
-const promises_1 = __importDefault(__nccwpck_require__(1943));
+const core = __importStar(__nccwpck_require__(9999));
+const github = __importStar(__nccwpck_require__(2819));
+const promises_1 = __nccwpck_require__(1943);
 const r2_uploader_1 = __nccwpck_require__(8800);
 const update_registry_json_1 = __nccwpck_require__(8701);
 const constants_1 = __nccwpck_require__(9316);
@@ -64809,17 +64839,17 @@ const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) =>
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const webPlayerRepoPat = core_1.default.getInput('web-player-repo-pat', { required: true });
-            const webPlayerEnv = core_1.default.getInput('web-player-env', { required: true });
-            const gameName = core_1.default.getInput('game-name', { required: true });
-            const compression = core_1.default.getInput('compression');
-            const webGLBuildDir = core_1.default.getInput('webgl-build-dir', { required: true });
-            const r2AccessKey = core_1.default.getInput('r2-access-key', { required: true });
-            const r2SecretKey = core_1.default.getInput('r2-secret-key', { required: true });
-            const r2AccountId = core_1.default.getInput('r2-account-id', { required: true });
-            const r2Bucket = core_1.default.getInput('r2-bucket', { required: true });
-            const r2DestinationDir = core_1.default.getInput('r2-destination-dir', { required: true });
-            const r2CustomDomain = core_1.default.getInput('r2-custom-domain', { required: true });
+            const webPlayerRepoPat = core.getInput('web-player-repo-pat', { required: true });
+            const webPlayerEnv = core.getInput('web-player-env', { required: true });
+            const gameName = core.getInput('game-name', { required: true });
+            const compression = core.getInput('compression');
+            const webGLBuildDir = core.getInput('webgl-build-dir', { required: true });
+            const r2AccessKey = core.getInput('r2-access-key', { required: true });
+            const r2SecretKey = core.getInput('r2-secret-key', { required: true });
+            const r2AccountId = core.getInput('r2-account-id', { required: true });
+            const r2Bucket = core.getInput('r2-bucket', { required: true });
+            const r2DestinationDir = core.getInput('r2-destination-dir', { required: true });
+            const r2CustomDomain = core.getInput('r2-custom-domain', { required: true });
             if (!isValidWebPlayerEnv(webPlayerEnv)) {
                 throw new Error(`Invalid web-player-env: ${webPlayerEnv}, must be one of ${constants_1.WEB_PLAYER_ENVS.join(', ')}`);
             }
@@ -64834,10 +64864,10 @@ function main() {
                 r2DestinationDir,
                 webGLBuildDir,
             });
-            const files = yield promises_1.default.readdir(webGLBuildDir);
+            const files = yield (0, promises_1.readdir)(webGLBuildDir);
             const uploadPromises = files.map((file) => r2Uploader.upload(file));
             yield Promise.all(uploadPromises);
-            const octokit = github_1.default.getOctokit(webPlayerRepoPat);
+            const octokit = github.getOctokit(webPlayerRepoPat);
             const owner = 'ryanditjia';
             const repo = 'demo-actions';
             const jsonFilename = constants_1.JSON_BY_ENV[webPlayerEnv];
@@ -64883,7 +64913,7 @@ function main() {
             let errorMsg = 'Something went wrong';
             if (error instanceof Error)
                 errorMsg = error.message;
-            core_1.default.setFailed(errorMsg);
+            core.setFailed(errorMsg);
         }
     });
 }
@@ -64905,13 +64935,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.R2Uploader = void 0;
-const promises_1 = __importDefault(__nccwpck_require__(1943));
-const path_1 = __importDefault(__nccwpck_require__(6928));
+const promises_1 = __nccwpck_require__(1943);
+const path_1 = __nccwpck_require__(6928);
 const client_s3_1 = __nccwpck_require__(6933);
 const getContentType = (filename) => {
     if (filename.endsWith('.loader.js'))
@@ -64940,8 +64967,8 @@ class R2Uploader {
     }
     upload(filename) {
         return __awaiter(this, void 0, void 0, function* () {
-            const pathToFile = path_1.default.join(this.webGLBuildDir, filename);
-            const file = yield promises_1.default.readFile(pathToFile);
+            const pathToFile = (0, path_1.join)(this.webGLBuildDir, filename);
+            const file = yield (0, promises_1.readFile)(pathToFile);
             const command = new client_s3_1.PutObjectCommand({
                 Bucket: this.r2Bucket,
                 Key: `${this.r2DestinationDir}/${filename}`,

@@ -1,6 +1,6 @@
-import core from '@actions/core'
-import github from '@actions/github'
-import fs from 'fs/promises'
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import { readdir } from 'fs/promises'
 import { R2Uploader } from './r2-uploader'
 import { updateRegistryJSON } from './update-registry-json'
 import { COMPRESSIONS, JSON_BY_ENV, REGISTRY_DIR, WEB_PLAYER_ENVS } from './constants'
@@ -49,7 +49,7 @@ async function main() {
       webGLBuildDir,
     })
 
-    const files = await fs.readdir(webGLBuildDir)
+    const files = await readdir(webGLBuildDir)
     const uploadPromises = files.map((file) => r2Uploader.upload(file))
     await Promise.all(uploadPromises)
 
