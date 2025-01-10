@@ -70,7 +70,7 @@ export class R2Uploader {
 
     const response = await this.client.send(command)
     if (response.$metadata.httpStatusCode === 200) {
-      console.log(`Uploaded ${key} to R2`)
+      console.log(`📤 Uploaded ${key} to R2.`)
     }
     return response
   }

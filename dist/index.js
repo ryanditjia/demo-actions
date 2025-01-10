@@ -64913,7 +64913,7 @@ function main() {
                 sha: currentFile.sha,
             });
             if (response.status === 200 || response.status === 201) {
-                console.log(`Updated ${jsonFilename} in registry:`);
+                console.log(`📒 Updated ${jsonFilename} in registry:`);
                 console.log(updatedJSON);
                 yield (0, post_build_size_to_pr_1.postBuildSizeToPR)(webGLBuildDir);
             }
@@ -65008,11 +65008,11 @@ function postBuildSizeToPR(webGLBuildDir) {
         const existingComment = yield findExistingComment(octokit, prNumber);
         if (existingComment) {
             yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, github.context.repo), { comment_id: existingComment.id, body }));
-            console.log('Updated existing PR comment');
+            console.log('💬 Updated build size in existing PR comment.');
         }
         else {
             yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, github.context.repo), { issue_number: prNumber, body }));
-            console.log('Created new PR comment');
+            console.log('💬 Posted build size to PR comment.');
         }
     });
 }
@@ -65138,7 +65138,7 @@ class R2Uploader {
             }
             const response = yield this.client.send(command);
             if (response.$metadata.httpStatusCode === 200) {
-                console.log(`Uploaded ${key} to R2`);
+                console.log(`📤 Uploaded ${key} to R2.`);
             }
             return response;
         });
