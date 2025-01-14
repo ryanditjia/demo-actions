@@ -4,14 +4,22 @@ import { exec, ExecOptions } from '@actions/exec'
 import type { GetResponseDataTypeFromEndpointMethod } from '@octokit/types'
 import { BUILD_SIZE_COMMENT_LANDMARK } from './constants'
 
-export async function postBuildSizeToPR(webGLBuildDir: string) {
+export async function postBuildSizeToPR({
+  gameName,
+  webGLBuildDir,
+  r2DestinationDir,
+}: {
+  gameName: string
+  webGLBuildDir: string
+  r2DestinationDir: string
+}) {
   if (github.context.eventName !== 'pull_request') return
 
   const prNumber = github.context.payload.pull_request?.number
   if (!prNumber) return
 
   const buildSize = await getBuildSize(webGLBuildDir)
-  const body = formatBody(buildSize)
+  const body = formatBody({ buildSize, gameName, r2DestinationDir })
 
   const githubToken = core.getInput('github-token')
   const octokit = github.getOctokit(githubToken)
@@ -59,12 +67,25 @@ async function getBuildSize(webGLBuildDir: string) {
   return output
 }
 
-function formatBody(buildSize: string) {
+function formatBody({
+  buildSize,
+  gameName,
+  r2DestinationDir,
+}: {
+  buildSize: string
+  gameName: string
+  r2DestinationDir: string
+}) {
   return `
 ### :file_folder: Artifact Build Size Info!
 ___
 \`\`\`
 ${buildSize}\`\`\`
+
+### Preview
+
+Preview URL: https://play.argus.dev/${gameName}/${r2DestinationDir}
+
 <!-- ${BUILD_SIZE_COMMENT_LANDMARK} -->
 `
 }

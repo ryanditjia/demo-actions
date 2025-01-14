@@ -111,7 +111,7 @@ async function main() {
       console.log(`📒 Updated ${jsonFilename} in registry:`)
       console.log(updatedJSON)
 
-      await postBuildSizeToPR(webGLBuildDir)
+      await postBuildSizeToPR({ gameName, r2DestinationDir, webGLBuildDir })
     } else {
       throw new Error(`Unable to update ${jsonFilename}`)
     }

@@ -64921,7 +64921,7 @@ function main() {
             if (response.status === 200 || response.status === 201) {
                 console.log(`📒 Updated ${jsonFilename} in registry:`);
                 console.log(updatedJSON);
-                yield (0, post_build_size_to_pr_1.postBuildSizeToPR)(webGLBuildDir);
+                yield (0, post_build_size_to_pr_1.postBuildSizeToPR)({ gameName, r2DestinationDir, webGLBuildDir });
             }
             else {
                 throw new Error(`Unable to update ${jsonFilename}`);
@@ -64999,16 +64999,16 @@ const github = __importStar(__nccwpck_require__(2819));
 const core = __importStar(__nccwpck_require__(9999));
 const exec_1 = __nccwpck_require__(8872);
 const constants_1 = __nccwpck_require__(9316);
-function postBuildSizeToPR(webGLBuildDir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a;
+function postBuildSizeToPR(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ gameName, webGLBuildDir, r2DestinationDir, }) {
+        var _b;
         if (github.context.eventName !== 'pull_request')
             return;
-        const prNumber = (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number;
+        const prNumber = (_b = github.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.number;
         if (!prNumber)
             return;
         const buildSize = yield getBuildSize(webGLBuildDir);
-        const body = formatBody(buildSize);
+        const body = formatBody({ buildSize, gameName, r2DestinationDir });
         const githubToken = core.getInput('github-token');
         const octokit = github.getOctokit(githubToken);
         const existingComment = yield findExistingComment(octokit, prNumber);
@@ -65045,12 +65045,17 @@ function getBuildSize(webGLBuildDir) {
         return output;
     });
 }
-function formatBody(buildSize) {
+function formatBody({ buildSize, gameName, r2DestinationDir, }) {
     return `
 ### :file_folder: Artifact Build Size Info!
 ___
 \`\`\`
 ${buildSize}\`\`\`
+
+### Preview
+
+Preview URL: https://play.argus.dev/${gameName}/${r2DestinationDir}
+
 <!-- ${constants_1.BUILD_SIZE_COMMENT_LANDMARK} -->
 `;
 }
