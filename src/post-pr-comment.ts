@@ -78,7 +78,7 @@ function formatBody({
 }) {
   return `
 ### :file_folder: Artifact Build Size Info
-___
+
 \`\`\`
 ${buildSize}\`\`\`
 

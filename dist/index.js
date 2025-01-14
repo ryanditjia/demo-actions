@@ -65047,7 +65047,7 @@ function getBuildSize(webGLBuildDir) {
 function formatBody({ buildSize, gameName, r2DestinationDir, }) {
     return `
 ### :file_folder: Artifact Build Size Info
-___
+
 \`\`\`
 ${buildSize}\`\`\`
 
