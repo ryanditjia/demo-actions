@@ -10,7 +10,7 @@ import {
   REGISTRY_REPO,
   WEB_PLAYER_ENVS,
 } from './constants'
-import { postBuildSizeToPR } from './post-build-size-to-pr'
+import { postPRComment } from './post-pr-comment'
 import type { Compression } from './types'
 
 const isValidWebPlayerEnv = (env: string): env is keyof typeof JSON_BY_ENV =>
@@ -111,7 +111,7 @@ async function main() {
       console.log(`📒 Updated ${jsonFilename} in registry:`)
       console.log(updatedJSON)
 
-      await postBuildSizeToPR({ gameName, r2DestinationDir, webGLBuildDir })
+      await postPRComment({ gameName, r2DestinationDir, webGLBuildDir })
     } else {
       throw new Error(`Unable to update ${jsonFilename}`)
     }

@@ -13,8 +13,7 @@ export const JSON_BY_ENV = {
 }
 
 /**
- * Landmark of the Artifact Build Size Info comment.
  * Used to identify if there is already a comment in the PR.
  * If there is, we will update the comment instead of creating a new one.
  */
-export const BUILD_SIZE_COMMENT_LANDMARK = 'artifact-build-size-info'
+export const COMMENT_LANDMARK = 'web-player-registry-info'

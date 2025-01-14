@@ -2,9 +2,9 @@ import * as github from '@actions/github'
 import * as core from '@actions/core'
 import { exec, ExecOptions } from '@actions/exec'
 import type { GetResponseDataTypeFromEndpointMethod } from '@octokit/types'
-import { BUILD_SIZE_COMMENT_LANDMARK } from './constants'
+import { COMMENT_LANDMARK } from './constants'
 
-export async function postBuildSizeToPR({
+export async function postPRComment({
   gameName,
   webGLBuildDir,
   r2DestinationDir,
@@ -77,16 +77,16 @@ function formatBody({
   r2DestinationDir: string
 }) {
   return `
-### :file_folder: Artifact Build Size Info!
+### :file_folder: Artifact Build Size Info
 ___
 \`\`\`
 ${buildSize}\`\`\`
 
-### Preview
+### :mag: Web Player Preview
 
-Preview URL: https://play.argus.dev/${gameName}/${r2DestinationDir}
+https://play.argus.dev/${gameName}/${r2DestinationDir}
 
-<!-- ${BUILD_SIZE_COMMENT_LANDMARK} -->
+<!-- ${COMMENT_LANDMARK} -->
 `
 }
 
@@ -106,7 +106,7 @@ async function findExistingComment(
       issue_number: prNumber,
     }
   )) {
-    comment = comments.find((comment) => comment?.body?.includes(BUILD_SIZE_COMMENT_LANDMARK))
+    comment = comments.find((comment) => comment?.body?.includes(COMMENT_LANDMARK))
     if (comment) break
   }
 

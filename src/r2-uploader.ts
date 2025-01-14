@@ -69,9 +69,8 @@ export class R2Uploader {
 }
 
 function getContentType(filename: string) {
-  if (filename.endsWith('.loader.js')) return 'application/javascript'
-  if (filename.endsWith('.framework.js.br')) return 'application/javascript'
-  if (filename.endsWith('.wasm.br')) return 'application/wasm'
-  if (filename.endsWith('.data.br')) return 'text/plain'
+  if (filename.includes('.js')) return 'application/javascript'
+  if (filename.includes('.wasm')) return 'application/wasm'
+  if (filename.includes('.data')) return 'text/plain'
   throw new Error(`Unsupported file type for ${filename}`)
 }

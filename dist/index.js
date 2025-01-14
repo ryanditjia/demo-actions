@@ -64767,7 +64767,7 @@ function wrappy (fn, cb) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BUILD_SIZE_COMMENT_LANDMARK = exports.JSON_BY_ENV = exports.REGISTRY_DIR = exports.REGISTRY_REPO = exports.WEB_PLAYER_ENVS = exports.COMPRESSIONS = void 0;
+exports.COMMENT_LANDMARK = exports.JSON_BY_ENV = exports.REGISTRY_DIR = exports.REGISTRY_REPO = exports.WEB_PLAYER_ENVS = exports.COMPRESSIONS = void 0;
 exports.COMPRESSIONS = ['brotli', 'gzip', 'none'];
 exports.WEB_PLAYER_ENVS = ['production', 'development'];
 exports.REGISTRY_REPO = {
@@ -64781,11 +64781,10 @@ exports.JSON_BY_ENV = {
     development: 'development.json',
 };
 /**
- * Landmark of the Artifact Build Size Info comment.
  * Used to identify if there is already a comment in the PR.
  * If there is, we will update the comment instead of creating a new one.
  */
-exports.BUILD_SIZE_COMMENT_LANDMARK = 'artifact-build-size-info';
+exports.COMMENT_LANDMARK = 'web-player-registry-info';
 
 
 /***/ }),
@@ -64844,7 +64843,7 @@ const promises_1 = __nccwpck_require__(1943);
 const r2_uploader_1 = __nccwpck_require__(8800);
 const update_registry_json_1 = __nccwpck_require__(8701);
 const constants_1 = __nccwpck_require__(9316);
-const post_build_size_to_pr_1 = __nccwpck_require__(3737);
+const post_pr_comment_1 = __nccwpck_require__(4562);
 const isValidWebPlayerEnv = (env) => constants_1.WEB_PLAYER_ENVS.some((e) => e === env);
 const isValidCompression = (compression) => constants_1.COMPRESSIONS.some((e) => e === compression);
 main();
@@ -64921,7 +64920,7 @@ function main() {
             if (response.status === 200 || response.status === 201) {
                 console.log(`📒 Updated ${jsonFilename} in registry:`);
                 console.log(updatedJSON);
-                yield (0, post_build_size_to_pr_1.postBuildSizeToPR)({ gameName, r2DestinationDir, webGLBuildDir });
+                yield (0, post_pr_comment_1.postPRComment)({ gameName, r2DestinationDir, webGLBuildDir });
             }
             else {
                 throw new Error(`Unable to update ${jsonFilename}`);
@@ -64939,7 +64938,7 @@ function main() {
 
 /***/ }),
 
-/***/ 3737:
+/***/ 4562:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -64994,12 +64993,12 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.postBuildSizeToPR = postBuildSizeToPR;
+exports.postPRComment = postPRComment;
 const github = __importStar(__nccwpck_require__(2819));
 const core = __importStar(__nccwpck_require__(9999));
 const exec_1 = __nccwpck_require__(8872);
 const constants_1 = __nccwpck_require__(9316);
-function postBuildSizeToPR(_a) {
+function postPRComment(_a) {
     return __awaiter(this, arguments, void 0, function* ({ gameName, webGLBuildDir, r2DestinationDir, }) {
         var _b;
         if (github.context.eventName !== 'pull_request')
@@ -65047,16 +65046,16 @@ function getBuildSize(webGLBuildDir) {
 }
 function formatBody({ buildSize, gameName, r2DestinationDir, }) {
     return `
-### :file_folder: Artifact Build Size Info!
+### :file_folder: Artifact Build Size Info
 ___
 \`\`\`
 ${buildSize}\`\`\`
 
-### Preview
+### :mag: Web Player Preview
 
-Preview URL: https://play.argus.dev/${gameName}/${r2DestinationDir}
+https://play.argus.dev/${gameName}/${r2DestinationDir}
 
-<!-- ${constants_1.BUILD_SIZE_COMMENT_LANDMARK} -->
+<!-- ${constants_1.COMMENT_LANDMARK} -->
 `;
 }
 function findExistingComment(octokit, prNumber) {
@@ -65068,7 +65067,7 @@ function findExistingComment(octokit, prNumber) {
                 _c = _f.value;
                 _d = false;
                 const { data: comments } = _c;
-                comment = comments.find((comment) => { var _a; return (_a = comment === null || comment === void 0 ? void 0 : comment.body) === null || _a === void 0 ? void 0 : _a.includes(constants_1.BUILD_SIZE_COMMENT_LANDMARK); });
+                comment = comments.find((comment) => { var _a; return (_a = comment === null || comment === void 0 ? void 0 : comment.body) === null || _a === void 0 ? void 0 : _a.includes(constants_1.COMMENT_LANDMARK); });
                 if (comment)
                     break;
             }
@@ -65148,13 +65147,11 @@ class R2Uploader {
 }
 exports.R2Uploader = R2Uploader;
 function getContentType(filename) {
-    if (filename.endsWith('.loader.js'))
+    if (filename.includes('.js'))
         return 'application/javascript';
-    if (filename.endsWith('.framework.js.br'))
-        return 'application/javascript';
-    if (filename.endsWith('.wasm.br'))
+    if (filename.includes('.wasm'))
         return 'application/wasm';
-    if (filename.endsWith('.data.br'))
+    if (filename.includes('.data'))
         return 'text/plain';
     throw new Error(`Unsupported file type for ${filename}`);
 }
