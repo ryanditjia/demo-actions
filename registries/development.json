@@ -14,10 +14,10 @@
     }
   },
   "demoargusid": {
-    "url_prefix": "https://cdn.ryanditjia.com/435d25824dc4946eac2183edf7bc92547cbf85f4/WebGL",
+    "url_prefix": "https://cdn.ryanditjia.com/86f95e9acf9640aa9903fbd36e1070eea184c725/WebGL",
     "compression": "brotli",
     "argus_id_unity_methods": {
-      "ReceiveJWT": "Testing1234.ReceiveJWT"
+      "ReceiveJWT": "MenuManager.ReceiveJWT"
     }
   }
 }
