@@ -84,7 +84,7 @@ ${buildSize}\`\`\`
 
 ### :mag: Web Player Preview
 
-https://play.argus.dev/${gameName}/${r2DestinationDir}
+https://play.argus-dev.com/${gameName}/${r2DestinationDir}
 
 <!-- ${COMMENT_LANDMARK} -->
 `

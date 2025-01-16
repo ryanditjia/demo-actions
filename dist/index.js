@@ -64853,6 +64853,9 @@ function main() {
             const webPlayerRepoPat = core.getInput('web-player-repo-pat', { required: true });
             const webPlayerEnv = core.getInput('web-player-env', { required: true });
             const gameName = core.getInput('game-name', { required: true });
+            const argusIDUnityMethodReceiveJWT = core.getInput('argus-id-unity-method-receive-jwt', {
+                required: true,
+            });
             const compression = core.getInput('compression');
             const webGLBuildDir = core.getInput('webgl-build-dir', { required: true });
             const r2AccessKey = core.getInput('r2-access-key', { required: true });
@@ -64902,6 +64905,7 @@ function main() {
                 gameName,
                 urlPrefix: `${r2CustomDomain}/${r2DestinationDir}/WebGL`,
                 compression,
+                argusIDUnityMethodReceiveJWT,
                 currentJSON,
             });
             const response = yield webPlayerOctokit.rest.repos.createOrUpdateFileContents({
@@ -65053,7 +65057,7 @@ ${buildSize}\`\`\`
 
 ### :mag: Web Player Preview
 
-https://play.argus.dev/${gameName}/${r2DestinationDir}
+https://play.argus-dev.com/${gameName}/${r2DestinationDir}
 
 <!-- ${constants_1.COMMENT_LANDMARK} -->
 `;
@@ -65166,9 +65170,13 @@ function getContentType(filename) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.updateRegistryJSON = updateRegistryJSON;
-function updateRegistryJSON({ gameName, urlPrefix, compression, currentJSON, }) {
+function updateRegistryJSON({ gameName, urlPrefix, compression, argusIDUnityMethodReceiveJWT, currentJSON, }) {
     const map = new Map(Object.entries(currentJSON));
-    map.set(gameName, { url_prefix: urlPrefix, compression });
+    map.set(gameName, {
+        url_prefix: urlPrefix,
+        compression,
+        argus_id_unity_methods: { ReceiveJWT: argusIDUnityMethodReceiveJWT },
+    });
     return Object.fromEntries(map);
 }
 

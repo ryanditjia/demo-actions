@@ -1,19 +1,25 @@
 name: 'Web Player – Upload to R2 and Update Registry'
 inputs:
-  web-player-repo-pat:
-    description: 'Fine-grained personal access token that has write access to the Web Player repo. Example: github_pat_asdf1234'
-    required: true
-  web-player-env:
-    description: 'The environment to update. Example: production | development (for production.json and development.json respectively)'
-    required: true
   game-name:
     description: 'Game name being uploaded. Example: blocksurvivor'
     required: true
   compression:
     description: 'Compression used for the build. Example: brotli | gzip | none.'
     default: 'brotli'
+  web-player-env:
+    description: 'The environment to update. Example: production | development (for production.json and development.json respectively)'
+    required: true
+  argus-id-unity-method-receive-jwt:
+    description: 'The Unity `objectName.methodName` to use for receiving the JWT from the Argus ID login flow. Example: Bootstrap.ReceiveJWT'
+    required: true
   webgl-build-dir:
     description: 'Path to the WebGL build directory. Example: ./build/WebGL/WebGL/Build'
+    required: true
+  web-player-repo-pat:
+    description: 'Fine-grained personal access token that has write access to the Web Player repo. Example: github_pat_asdf1234'
+    required: true
+  r2-account-id:
+    description: 'R2 account ID'
     required: true
   r2-access-key:
     description: 'R2 access key'
@@ -21,20 +27,17 @@ inputs:
   r2-secret-key:
     description: 'R2 secret key'
     required: true
-  r2-account-id:
-    description: 'R2 account ID'
-    required: true
   r2-bucket:
-    description: 'R2 bucket'
+    description: 'R2 bucket, e.g. production-block-survivor'
     required: true
   r2-custom-domain:
-    description: 'R2 custom domain'
+    description: 'R2 custom domain, e.g. https://cdn.blocksurvivor.com'
     required: true
   r2-destination-dir:
-    description: 'R2 destination directory'
+    description: 'R2 destination directory, usually the SHA of the commit'
     required: true
   github-token:
-    description: 'Repository’s GitHub token for posting comments to PRs'
+    description: 'Repository’s GitHub token for posting comments to PRs. No need to set this.'
     default: ${{ github.token }}
 runs:
   using: 'node20'

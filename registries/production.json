@@ -1,14 +1,23 @@
 {
   "blocksurvivor": {
     "url_prefix": "https://cdn.blocksurvivor.com/0011/WebGL",
-    "compression": "brotli"
+    "compression": "brotli",
+    "argus_id_unity_methods": {
+      "ReceiveJWT": "Testing1234.ReceiveJWT"
+    }
   },
   "anothergame": {
     "url_prefix": "https://cdn.ryanditjia.com/745c77febdff18f0554f48956d3bde7f53953d36/WebGL",
-    "compression": "brotli"
+    "compression": "brotli",
+    "argus_id_unity_methods": {
+      "ReceiveJWT": "Testing1234.ReceiveJWT"
+    }
   },
   "demoargusid": {
     "url_prefix": "https://cdn.ryanditjia.com/4f1d2db644becf6b5702cac7123fb770e1c0b7d6/WebGL",
-    "compression": "brotli"
+    "compression": "brotli",
+    "argus_id_unity_methods": {
+      "ReceiveJWT": "Testing1234.ReceiveJWT"
+    }
   }
 }
